@@ -12,8 +12,8 @@ setup(name='ib_orchestrator_api',
       author='Bayware',
       packages=find_packages(),
       install_requires=[
-          'requests==2.19.1',
-          'urllib3==1.23'
+          'requests>=2.19.1',
+          'urllib3>=1.23'
       ],
       include_package_data=True,
       zip_safe=False)

@@ -13,4 +13,6 @@ env.bak/
 venv.bak/
 
 .idea
+.dist
+.ib_orchestrator_api.egg-info
 

@@ -1,0 +1,509 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import requests
+import json
+import re
+import socket
+import warnings
+from .errors import *
+
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
+warnings.filterwarnings('ignore')
+# logging.basicConfig(filename='example.log', level=logging.DEBUG)
+
+URL_USER = "api/v1/webpanel/identity/api/user"
+URL_DOMAIN = "api/v1/webpanel/identity/api/domain"
+URL_CONTROLLER = "api/v1/webpanel/controller"
+URL_CONTRACTS = "api/v1/webpanel/topic"
+URL_CONTRACT_ROLE = "api/v1/webpanel/topicrole"
+URL_ZONE = "api/v1/webpanel/subnet"
+URL_TEMPLATE = "api/v1/webpanel/servicetempl"
+URL_TEMPLATE_ROLE = "api/v1/webpanel/servicetemplaterole"
+URL_CONFIGURE_LINK = "api/v1/webpanel/configured_link"
+
+
+class IBOrchestartorAPI:
+    def __init__(self, hostname, login, password, base_url, domain='default'):
+        self.hostname = hostname
+        self.domain = domain
+        self.login = login
+        self.password = password
+        self.base_url = base_url
+        self.headers = {'Content-Type': 'application/json'}
+        self.ip_address = self.get_ip_address(hostname)
+
+    @staticmethod
+    def read_from_json(filename):
+        with open(filename, 'r') as f:
+            json_dict = json.loads(f.read())
+        return json_dict
+
+    @staticmethod
+    def get_ip_address(hostname):
+        regex = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
+        result = regex.match(hostname)
+        address = ''
+        if not result:
+            address = socket.gethostbyname(hostname)
+
+        return address
+
+    def get_domain_list(self):
+        url_domain = self.base_url + URL_DOMAIN
+        result = requests.get(url_domain, verify=False, headers=self.headers)
+        domain_list = json.loads(result.text)
+        return domain_list
+
+    def get_service_list(self):
+        url_service = self.base_url + URL_TEMPLATE
+        result = requests.get(url_service, verify=False, headers=self.headers)
+        service_list = json.loads(result.text)
+        return service_list
+
+    @staticmethod
+    def get_domain_id(domain_list, domain_name):
+        domain_id = ''
+        for domain in domain_list:
+            if domain['domain'] == domain_name:
+                domain_id = domain['id']
+        if domain_id is None or domain_id is '':
+            raise DomainNameError()
+        return domain_id
+
+    def authorization(self):
+        token_url = self.base_url + "api/v1/webpanel/token"
+        response = requests.post(
+            token_url,
+            json={'domain': self.domain, 'username': self.login, 'password': self.password},
+            verify=False)
+        if response.status_code == 200 or response.status_code == 201:
+            tmp_token = json.loads(response.text)
+            token = "Bearer " + tmp_token.get("token")
+            self.headers.update({"Authorization": token})
+            print("Login successful")
+        else:
+            print("Error login")
+            raise LoginError()
+
+    def add_domain(self, domain_json):
+        url_domain = self.base_url + URL_DOMAIN
+        result = requests.get(url_domain, verify=False, headers=self.headers)
+        tmp_domain = json.loads(result.text)
+        if not any(d['domain'] == domain_json['domain'] for d in tmp_domain['result']):
+            response = requests.post(url_domain, json=domain_json, headers=self.headers, verify=False)
+
+            if response.status_code == 200 or response.status_code == 201:
+                print("Domain %s - added" % domain_json['domain'])
+            else:
+                print("Error add domain (%s)" % domain_json['domain'])
+                print(response.text)
+                raise DomainError()
+        else:
+            print("Domain %s - already created" % domain_json['domain'])
+
+    def add_user(self, user_json):
+        url_user = self.base_url + URL_USER
+        result = requests.get(url_user, verify=False, headers=self.headers)
+        tmp_users = json.loads(result.text)
+        if not any((d['username'] == user_json['username'] and
+                    d['user_domain'] == user_json['user_domain']) for d in tmp_users['result']):
+            response = requests.post(url_user, json=user_json, headers=self.headers, verify=False)
+            if response.status_code == 200 or response.status_code == 201:
+                print("User %s - added" % user_json['username'])
+            else:
+                print("Error add user (%s)" % user_json['username'])
+                print(response.text)
+                raise UserError()
+        else:
+            print("User %s - already created" % user_json['username'])
+
+    def add_zone(self, zone_json):
+        url = self.base_url + URL_CONTROLLER
+        controller_result = requests.get(url, verify=False, headers=self.headers)
+        tmp_controllers = json.loads(controller_result.text)
+        controller_pri_id = ""
+        controller_sec_id = ""
+        for controller in tmp_controllers['result']:
+            if controller['name'] == zone_json["controller_pri_id"]:
+                controller_pri_id = str(controller['id'])
+            if controller['name'] == zone_json["controller_sec_id"]:
+                controller_sec_id = str(controller['id'])
+
+        zone_json.update({"controller_pri_id": controller_pri_id,
+                          "controller_sec_id": controller_sec_id})
+        url_zone = self.base_url + "api/v1/webpanel/subnet"
+        result = requests.get(url_zone, verify=False, headers=self.headers)
+        tmp_zone = json.loads(result.text)
+        if not any(d['name'] == zone_json['name'] for d in tmp_zone['result']):
+            response = requests.put(url_zone, json=zone_json, headers=self.headers, verify=False)
+            if response.status_code == 200 or response.status_code == 201:
+                print("Zone '%s' - added" % zone_json['name'])
+            else:
+                print("Error add zone (%s)" % zone_json['name'])
+                print(response.text)
+                raise ZoneError()
+        else:
+            print("Zone '%s' - already created" % zone_json['name'])
+
+    def add_managed_network(self, managed_network, zone=None, zone_id=None):
+        if zone_id is None:
+            if zone is None:
+                return "Zone Error"
+            else:
+                url_zone = self.base_url + URL_ZONE
+                result = requests.get(url_zone, verify=False, headers=self.headers)
+                tmp_zone = json.loads(result.text)
+                for subnet in tmp_zone['result']:
+                    if subnet['name'] == zone:
+                        zone_id = str(subnet['id'])
+                    else:
+                        return "you input invalid zone"
+
+        url = self.base_url + "api/v1/webpanel/subnet/" + zone_id + "/managed"
+        managed_network.update({"subnet_id": zone_id})
+        result = requests.get(url, verify=False, headers=self.headers)
+        tmp_managed = json.loads(result.text)
+
+        if not any(d["network_prefix"] == managed_network["network_prefix"] for d in tmp_managed['result']):
+            response = requests.put(url, json=managed_network, headers=self.headers, verify=False)
+            if response.status_code == 200 or response.status_code == 201:
+                return True
+            else:
+                print("Error add managed_network: %s" % managed_network)
+                print(response.text)
+                raise ManagedNetworkError()
+        else:
+            print("managed_network already created")
+
+    def add_zone_managed_network(self, managed_network):
+        url_subnet = self.base_url + URL_ZONE
+        response_subnet = requests.get(url_subnet, verify=False, headers=self.headers)
+
+        dict_domain = self.get_domain_list()
+        domain_id = ""
+        for domain in dict_domain['result']:
+            if domain['domain'] == managed_network["tunnel_switch_domain_id"]:
+                domain_id = str(domain['id'])
+
+        if domain_id == "":
+            return DomainIDError()
+
+        zone_id = ""
+        dict_subnet = json.loads(response_subnet.text)
+        for subnet in dict_subnet['result']:
+            if subnet['name'] == managed_network["subnet_id"]:
+                zone_id = str(subnet['id'])
+
+        cnt = 0
+        if "networks" in managed_network:
+            networks_prefix = managed_network["networks"]
+            del managed_network["networks"]
+            for prefix in networks_prefix:
+                network = managed_network
+                network["subnet_id"] = zone_id
+                network["network_prefix"] = prefix
+                network["tunnel_switch_domain_id"] = domain_id
+                if self.add_managed_network(managed_network=network, zone_id=zone_id):
+                    cnt += 1
+
+        if "network_files" in managed_network:
+            for network_file in managed_network["network_files"]:
+                tmp_network = self.read_from_json(network_file)
+                for prefix in tmp_network["networks"]:
+                    network = managed_network
+                    network["subnet_id"] = zone_id
+                    network["network_prefix"] = prefix
+                    network["tunnel_switch_domain_id"] = domain_id
+                    if self.add_managed_network(managed_network=network, zone_id=zone_id):
+                        cnt += 1
+
+        print("\t%s: Added %s networks" % (managed_network.get('subnet_id'), cnt))
+
+    def add_controller(self, controller_json):
+        controller_json.update({"host_fqdn": self.hostname,
+                                "ip_management": self.ip_address})
+
+        url = self.base_url + URL_CONTROLLER
+
+        result = requests.get(url, verify=False, headers=self.headers)
+        tmp_controllers = json.loads(result.text)
+        if not any(d['name'] == controller_json['name'] for d in tmp_controllers['result']):
+            response = requests.put(url, json=controller_json, headers=self.headers, verify=False)
+            if response.status_code == 200 or response.status_code == 201:
+                print("Controller '%s' -  added" % controller_json['descr'])
+            else:
+                print("Error add controller")
+                print(response.text)
+                raise ControllerError()
+        else:
+            print("Controller '%s' - already created" % controller_json['descr'])
+
+    def get_contrroler(self, **kwargs):
+        url = self.base_url + URL_CONTROLLER
+        data = {}
+        for key in kwargs:
+            data.update({key: kwargs.get(key)})
+        result = requests.get(url, params=data, headers=self.headers)
+        return result
+
+    def modify_service_template_role(self, template_role, tmp_template_roles):
+        """
+        Modification service template: accept service_template_role 
+        and tmp_template_roles(contains current templates_roles)
+        """
+        url = self.base_url + URL_TEMPLATE_ROLE
+        for tmp_template_role in tmp_template_roles['result']:
+            if tmp_template_role["role_name"] == template_role["role_name"]:
+                service_id = str(tmp_template_role['id'])
+                url = url + service_id
+                modify = False
+                modify_role = {}
+                for key in ["description", "permission", "code_binary", "endpoint_rules",
+                            "code_map", "path_binary", "path_params", "program_data_params"]:
+                    if template_role[key] != tmp_template_role[key] or \
+                            type(template_role[key]) != type(tmp_template_role[key]):
+                        modify_role.update({key: template_role[key]})
+                        modify = True
+                if modify:
+                    for key, value in modify_role.items():
+                        if not value:
+                            del modify_role[key]
+
+                    response = requests.post(url, json=modify_role, headers=self.headers, verify=False)
+                    if response.status_code == 200 or response.status_code == 201:
+                        print("\tmodify template_role")
+                    else:
+                        print("Error modify template_role")
+                        print(response.text)
+
+    def add_template_roles(self, template_roles):
+        url = self.base_url + URL_TEMPLATE_ROLE
+        url_service = self.base_url + "api/v1/webpanel/servicetempl/" + str(
+            template_roles["service_templ_id"]) + "/servicetemplrole"
+
+        response = requests.get(url_service, verify=False, headers=self.headers)
+        tmp_template_roles = json.loads(response.text)
+        if not any(d['role_name'] == template_roles['role_name'] for d in tmp_template_roles['result']):
+            response = requests.put(url, json=template_roles, headers=self.headers, verify=False)
+            if response.status_code == 200 or response.status_code == 201:
+                print("\tadd template_role")
+            else:
+                print("Error add template_role")
+                print(response.text)
+                raise ServiceTemplateRoleError()
+        else:
+            print("\ttemplate role already created")
+            self.modify_service_template_role(template_roles, tmp_template_roles)
+
+    def modify_service_template(self, service_template, tmp_templates):
+        """
+        Modification service template: accept service_template and tmp_templates(contains current templates)
+        """
+        url = self.base_url + URL_TEMPLATE
+        for tmp_template in tmp_templates['result']:
+            if tmp_template["service_name"] == service_template["service_name"]:
+                service_id = str(tmp_template['id'])
+                url = url + service_id
+                modify = False
+                for key in ["description"]:
+                    if service_template[key] != tmp_template[key] or \
+                            type(service_template[key]) != type(tmp_template[key]):
+                        modify = True
+                        break
+                if modify:
+                    response = requests.post(url, json=service_template,
+                                             headers=self.headers, verify=False)
+                    if response.status_code == 200 or response.status_code == 201:
+                        print("template modify")
+                    else:
+                        print("Error template modify")
+                        print(service_template)
+                        print(response.text)
+                else:
+                    print("no data to modify")
+
+    def add_service_template(self, service_template):
+        url = self.base_url + URL_TEMPLATE
+        url_domain = self.base_url + URL_DOMAIN
+        response_domain = requests.get(url_domain, verify=False, headers=self.headers)
+        dict_domain = json.loads(response_domain.text)
+        filename = service_template["service_tepl_file"]
+        template = self.read_from_json(filename)
+        service_template.update({"service_name": template["serviceName"],
+                                 "description": template["serviceDescription"],
+                                 })
+        del service_template["service_tepl_file"]
+        for template_domain in service_template["domains"]:
+            template_domain["id"] = self.get_domain_id(dict_domain['result'],
+                                                       template_domain["domain_name"])
+        tmp_result = requests.get(url, verify=False, headers=self.headers)
+        tmp_templates = json.loads(tmp_result.text)
+        template_id = ''
+        if not any(tmp_template['service_name'] == service_template['service_name'] for tmp_template in
+                   tmp_templates['result']):
+            response = requests.put(url, json=service_template, headers=self.headers, verify=False)
+            if response.status_code == 200 or response.status_code == 201:
+                d = json.loads(response.text)
+                template_id = d['id']
+                print("Template '%s' - added" % service_template['service_name'])
+            else:
+                print("Error add template (%s)" % service_template['service_name'])
+                print(response.text)
+                raise ServiceTemplateError()
+        else:
+            print("Template '%s' already created" % service_template['service_name'])
+            for tmp_template in tmp_templates['result']:
+                if tmp_template['service_name'] == service_template['service_name']:
+                    template_id = tmp_template['id']
+        self.modify_service_template(service_template, tmp_templates)
+        template_role = {}
+        for role in template['roles']:
+            template_role.update({
+                "service_templ_id": template_id,
+                "role_name": role.get("roleName", ""),
+                "description": role.get("roleDescription", ""),
+                "permission": role.get("permission", 0),
+                "code_binary": role.get("code", ""),
+                "code_map": role.get("codeMap", ""),
+                "path_binary": role.get("path", ""),
+                "path_params": role.get("pathParams", ""),
+                "endpoint_rules": role.get("endpointRules", ""),
+                "program_data_params": role.get("variables", "")
+            })
+            self.add_template_roles(template_role)
+
+    def add_contracts_role(self, contract_role=None,
+                           domain_name=None, domain_id=None, service_id=None):
+        url = self.base_url + URL_CONTRACT_ROLE
+        url_user = self.base_url + URL_USER
+        url_service = "%sapi/v1/webpanel/servicetempl/%s/servicetemplrole" \
+                      % (self.base_url, str(service_id))
+        tmp_contract_role = contract_role.copy()
+        result = requests.get(url, verify=False, headers=self.headers)
+        tmp_roles = json.loads(result.text)
+        if not any(d["role_name"] == contract_role["role_name"] and
+                   d["topic_id"] == contract_role["topic_id"] for d in tmp_roles['result']):
+            response_roles = requests.get(url_service, verify=False, headers=self.headers)
+            service_roles = json.loads(response_roles.text)
+            for service_role in service_roles["result"]:
+
+                if contract_role["service_role"] == service_role["role_name"]:
+                    contract_role["service_role_id"] = service_role["id"]
+                    contract_role.update({
+                        "description": service_role.get("description", ""),
+                        "path_binary": service_role.get("path_binary", ""),
+                        "path_params": service_role.get("path_params", ""),
+                        "endpoint_rules": service_role.get("endpoint_rules", ""),
+                        "program_data_params": service_role.get("program_data_params", ""),
+                        "endpoint_params": service_role.get("endpoint_params", ""),
+                        "token_params": service_role.get("token_params", "")})  # auth params
+
+            for key, value in tmp_contract_role.items():
+                if value is None or value == '' or value == []:
+                    del tmp_contract_role[key]
+            contract_role.update(tmp_contract_role)
+
+            result = requests.get(url_user, verify=False, headers=self.headers)
+            domain_users = json.loads(result.text)
+            for user in contract_role["users"]:
+                for domain_user in domain_users["result"]:
+                    if domain_user["username"] == user["user_name"] and domain_user["user_domain"] == domain_name:
+                        user_id = domain_user["id"]
+                        user["domain"].update({"domain_name": domain_name,
+                                               "id": domain_id})
+                        user.update({'domain_id': domain_id, 'id': user_id})
+
+            response = requests.put(url, json=contract_role, headers=self.headers, verify=False)
+            if response.status_code == 200 or response.status_code == 201:
+                print("\tcontract_role add")
+            else:
+                print("\terror add contract_role")
+                print(response.text)
+                raise ContractError()
+        else:
+            print("\tcontract_role already created")
+
+    def add_contracts(self, contract):
+        dict_domain = self.get_domain_list()
+        dict_service = self.get_service_list()
+        contract_domain_id = ''
+
+        for domain in dict_domain['result']:
+            # print(domain)
+            if domain['domain'] == contract['domain']:
+                contract_domain_id = domain['id']
+        domain_name = contract["domain"]
+        contract_service_id = ''
+        for service in dict_service['result']:
+            # print(service)
+            if service['service_name'] == contract["serviceName"]:
+                contract_service_id = service['id']
+
+        contract.update({"domain_id": contract_domain_id,
+                         "service_id": contract_service_id})
+        contract_roles = contract["contract_roles"]
+
+        del contract["contract_roles"]
+        url = self.base_url + URL_CONTRACTS
+        result = requests.get(url, verify=False, headers=self.headers)
+        tmp = json.loads(result.text)
+        contract_id = ""
+        if not any((d['name'] == contract['name']) for d in tmp['result']):
+            response = requests.put(url, json=contract, headers=self.headers, verify=False)
+            resp = json.loads(response.text)
+            if response.status_code == 200 or response.status_code == 201:
+                contract_id = resp["id"]
+                print("Contract '%s' - added" % contract['name'])
+                # print(response.text)
+            else:
+                print("      error add contract (%s)" % contract['name'])
+                print(response.text)
+                raise ContractRoleError()
+        else:
+            print("Contract '%s' - already created" % contract['name'])
+            for d in tmp["result"]:
+                if d["name"] == contract["name"]:
+                    contract_id = d["id"]
+
+        # print(contract_id)
+        for contract_role in contract_roles:
+            contract_role['topic_id'] = contract_id
+            self.add_contracts_role(contract_role=contract_role,
+                                    domain_name=domain_name, domain_id=contract_domain_id,
+                                    service_id=contract_service_id)
+
+    def configured_link(self, link_json):
+        url = self.base_url + URL_CONFIGURE_LINK
+        result = requests.get(url, verify=False, headers=self.headers)
+        tmp = json.loads(result.text)
+        if not any(
+                ((d["node_a"] == link_json["node_a"]) and (d["node_z"] == link_json["node_z"])) for d in tmp['result']):
+
+            response = requests.put(url, json=link_json, headers=self.headers, verify=False)
+            if response.status_code == 200 or response.status_code == 201:
+                print("Link from  '%s' to '%s' - add" % (link_json["node_a"], link_json["node_z"]))
+            else:
+                print("      error add link")
+                print(response.text)
+        else:
+            print("Link from  '%s' to '%s' - already created" % (link_json["node_a"], link_json["node_z"]))
+
+    def get_all_subnet(self):
+        """GET all subnets from controller"""
+        all_subnets = []
+        url_zone = self.base_url + URL_ZONE
+        result = requests.get(url_zone, verify=False, headers=self.headers)
+        tmp_zone = json.loads(result.text)
+
+        for zone in tmp_zone['result']:
+            zone_id = str(zone['id'])
+            url_managed_network = self.base_url + "api/v1/webpanel/subnet/" + zone_id + "/managed"
+            result = requests.get(url_managed_network, verify=False, headers=self.headers)
+            tmp_managed = json.loads(result.text)
+            for subnet in tmp_managed['result']:
+                all_subnets.append(subnet)
+        return all_subnets

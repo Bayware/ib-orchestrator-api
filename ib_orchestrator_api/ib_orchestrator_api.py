@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import requests
-import os
 import json
 import re
 import socket
 import warnings
-from errors import *
+from .errors import *
 
 try:
     from urllib.parse import urlparse
@@ -26,6 +25,7 @@ URL_TEMPLATE = "api/v1/webpanel/servicetempl"
 URL_TEMPLATE_ROLE = "api/v1/webpanel/servicetemplaterole"
 URL_CONFIGURE_LINK = "api/v1/webpanel/configured_link"
 
+
 class IBOrchestartorAPI:
     def __init__(self, hostname, login, password, base_url, domain='default'):
         self.hostname = hostname
@@ -42,14 +42,16 @@ class IBOrchestartorAPI:
             json_dict = json.loads(f.read())
         return json_dict
 
-    def get_ip_address(self, hostname):
+    @staticmethod
+    def get_ip_address(hostname):
         regex = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
         result = regex.match(hostname)
+        address = ''
         if not result:
             address = socket.gethostbyname(hostname)
 
         return address
-            
+
     def get_domain_list(self):
         url_domain = self.base_url + URL_DOMAIN
         result = requests.get(url_domain, verify=False, headers=self.headers)
@@ -75,9 +77,9 @@ class IBOrchestartorAPI:
     def authorization(self):
         token_url = self.base_url + "api/v1/webpanel/token"
         response = requests.post(
-                        token_url,
-                        json={'domain': self.domain, 'username': self.login, 'password': self.password},
-                        verify=False)
+            token_url,
+            json={'domain': self.domain, 'username': self.login, 'password': self.password},
+            verify=False)
         if response.status_code == 200 or response.status_code == 201:
             tmp_token = json.loads(response.text)
             token = "Bearer " + tmp_token.get("token")
@@ -86,7 +88,7 @@ class IBOrchestartorAPI:
         else:
             print("Error login")
             raise LoginError()
-        
+
     def add_domain(self, domain_json):
         url_domain = self.base_url + URL_DOMAIN
         result = requests.get(url_domain, verify=False, headers=self.headers)
@@ -180,7 +182,7 @@ class IBOrchestartorAPI:
     def add_zone_managed_network(self, managed_network):
         url_subnet = self.base_url + URL_ZONE
         response_subnet = requests.get(url_subnet, verify=False, headers=self.headers)
-        
+
         dict_domain = self.get_domain_list()
         domain_id = ""
         for domain in dict_domain['result']:
@@ -205,7 +207,7 @@ class IBOrchestartorAPI:
                 network["subnet_id"] = zone_id
                 network["network_prefix"] = prefix
                 network["tunnel_switch_domain_id"] = domain_id
-                if self.add_managed_network(zone_id, network):
+                if self.add_managed_network(managed_network=network, zone_id=zone_id):
                     cnt += 1
 
         if "network_files" in managed_network:
@@ -238,14 +240,15 @@ class IBOrchestartorAPI:
                 print(response.text)
                 raise ControllerError()
         else:
-            print "Controller '%s' - already created" % controller_json['descr']
+            print("Controller '%s' - already created" % controller_json['descr'])
 
     def get_contrroler(self, **kwargs):
         url = self.base_url + URL_CONTROLLER
         data = {}
         for key in kwargs:
-            data.update({key:kwargs.get(key)})
-        result=requests.get(url, params=data, headers=self.headers)
+            data.update({key: kwargs.get(key)})
+        result = requests.get(url, params=data, headers=self.headers)
+        return result
 
     def modify_service_template_role(self, template_role, tmp_template_roles):
         """
@@ -313,7 +316,7 @@ class IBOrchestartorAPI:
                         break
                 if modify:
                     response = requests.post(url, json=service_template,
-                                            headers=self.headers, verify=False)
+                                             headers=self.headers, verify=False)
                     if response.status_code == 200 or response.status_code == 201:
                         print("template modify")
                     else:
@@ -391,14 +394,14 @@ class IBOrchestartorAPI:
                 if contract_role["service_role"] == service_role["role_name"]:
                     contract_role["service_role_id"] = service_role["id"]
                     contract_role.update({
-                            "description": service_role.get("description", ""),
-                            "path_binary": service_role.get("path_binary", ""),
-                            "path_params": service_role.get("path_params", ""),
-                            "endpoint_rules": service_role.get("endpoint_rules", ""),
-                            "program_data_params": service_role.get("program_data_params", ""),
-                            "endpoint_params": service_role.get("endpoint_params", ""),
-                            "token_params": service_role.get("token_params", "")})# auth params
-        
+                        "description": service_role.get("description", ""),
+                        "path_binary": service_role.get("path_binary", ""),
+                        "path_params": service_role.get("path_params", ""),
+                        "endpoint_rules": service_role.get("endpoint_rules", ""),
+                        "program_data_params": service_role.get("program_data_params", ""),
+                        "endpoint_params": service_role.get("endpoint_params", ""),
+                        "token_params": service_role.get("token_params", "")})  # auth params
+
             for key, value in tmp_contract_role.items():
                 if value is None or value == '' or value == []:
                     del tmp_contract_role[key]
@@ -406,7 +409,6 @@ class IBOrchestartorAPI:
 
             result = requests.get(url_user, verify=False, headers=self.headers)
             domain_users = json.loads(result.text)
-            user_id = 0
             for user in contract_role["users"]:
                 for domain_user in domain_users["result"]:
                     if domain_user["username"] == user["user_name"] and domain_user["user_domain"] == domain_name:
@@ -478,7 +480,8 @@ class IBOrchestartorAPI:
         url = self.base_url + URL_CONFIGURE_LINK
         result = requests.get(url, verify=False, headers=self.headers)
         tmp = json.loads(result.text)
-        if not any(((d["node_a"] == link_json["node_a"]) and (d["node_z"] == link_json["node_z"])) for d in tmp['result']):
+        if not any(
+                ((d["node_a"] == link_json["node_a"]) and (d["node_z"] == link_json["node_z"])) for d in tmp['result']):
 
             response = requests.put(url, json=link_json, headers=self.headers, verify=False)
             if response.status_code == 200 or response.status_code == 201:
@@ -489,7 +492,6 @@ class IBOrchestartorAPI:
         else:
             print("Link from  '%s' to '%s' - already created" % (link_json["node_a"], link_json["node_z"]))
 
-
     def get_all_subnet(self):
         """GET all subnets from controller"""
         all_subnets = []
@@ -498,11 +500,10 @@ class IBOrchestartorAPI:
         tmp_zone = json.loads(result.text)
 
         for zone in tmp_zone['result']:
-            zone_name = zone['name']
             zone_id = str(zone['id'])
             url_managed_network = self.base_url + "api/v1/webpanel/subnet/" + zone_id + "/managed"
             result = requests.get(url_managed_network, verify=False, headers=self.headers)
             tmp_managed = json.loads(result.text)
             for subnet in tmp_managed['result']:
-                all_subnets.append(subnet)    
+                all_subnets.append(subnet)
         return all_subnets

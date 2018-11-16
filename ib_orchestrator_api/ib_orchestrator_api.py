@@ -278,7 +278,6 @@ class IBOrchestartorAPI:
                         print("\tmodify template_role")
                     else:
                         print("Error modify template_role")
-                        print(response.text)
 
     def add_template_roles(self, template_roles):
         url = self.base_url + URL_TEMPLATE_ROLE

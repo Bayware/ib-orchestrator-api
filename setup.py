@@ -1,4 +1,6 @@
+import os
 from setuptools import setup, find_packages
+
 
 setup(name='ib_orchestrator_api',
       version='0.2',

@@ -12,7 +12,17 @@ ENV/
 env.bak/
 venv.bak/
 
+<<<<<<< HEAD
 .idea
 .dist
 .ib_orchestrator_api.egg-info
+=======
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+>>>>>>> 9500c921841f9f556d2aa84534051a991cb6541a
 
+.idea

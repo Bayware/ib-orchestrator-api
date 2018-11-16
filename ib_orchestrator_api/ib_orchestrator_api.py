@@ -402,9 +402,14 @@ class IBOrchestartorAPI:
                         "endpoint_params": service_role.get("endpoint_params", ""),
                         "token_params": service_role.get("token_params", "")})  # auth params
 
+            keys = []
             for key, value in tmp_contract_role.items():
                 if value is None or value == '' or value == []:
+                    keys.append(key)
+            for key in keys:
+                if key in tmp_contract_role:
                     del tmp_contract_role[key]
+
             contract_role.update(tmp_contract_role)
 
             result = requests.get(url_user, verify=False, headers=self.headers)

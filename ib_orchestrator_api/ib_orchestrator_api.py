@@ -529,4 +529,4 @@ class IBOrchestratorAPI:
         result = requests.put(add_managed_network_url,
                               json=managed_network_json,
                               headers=self.headers, verify=False)
-        print (result.text)
+        return True

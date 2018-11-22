@@ -26,7 +26,7 @@ URL_TEMPLATE_ROLE = "api/v1/webpanel/servicetemplaterole"
 URL_CONFIGURE_LINK = "api/v1/webpanel/configured_link"
 
 
-class IBOrchestartorAPI:
+class IBOrchestratorAPI:
     def __init__(self, hostname, login, password, base_url, domain='default'):
         self.hostname = hostname
         self.domain = domain
@@ -252,7 +252,7 @@ class IBOrchestartorAPI:
 
     def modify_service_template_role(self, template_role, tmp_template_roles):
         """
-        Modification service template: accept service_template_role 
+        Modification service template: accept service_template_role
         and tmp_template_roles(contains current templates_roles)
         """
         url = self.base_url + URL_TEMPLATE_ROLE
@@ -278,6 +278,7 @@ class IBOrchestartorAPI:
                         print("\tmodify template_role")
                     else:
                         print("Error modify template_role")
+                        print(response.text)
 
     def add_template_roles(self, template_roles):
         url = self.base_url + URL_TEMPLATE_ROLE
@@ -401,14 +402,9 @@ class IBOrchestartorAPI:
                         "endpoint_params": service_role.get("endpoint_params", ""),
                         "token_params": service_role.get("token_params", "")})  # auth params
 
-            keys = []
             for key, value in tmp_contract_role.items():
                 if value is None or value == '' or value == []:
-                    keys.append(key)
-            for key in keys:
-                if key in tmp_contract_role:
                     del tmp_contract_role[key]
-
             contract_role.update(tmp_contract_role)
 
             result = requests.get(url_user, verify=False, headers=self.headers)
@@ -511,3 +507,26 @@ class IBOrchestartorAPI:
             for subnet in tmp_managed['result']:
                 all_subnets.append(subnet)
         return all_subnets
+
+    def get_all_zones(self):
+        """GET all zones from controller"""
+        url_zones = self.base_url + URL_ZONE
+        result = requests.get(url_zones, verify=False, headers=self.headers)
+        all_zones = json.loads(result.text)
+        return all_zones
+
+    def add_missing_managed_network(self, zone_id, network):
+        """ADD missing managed network into appropriate zone"""
+        zone_url = self.base_url + "api/v1/webpanel/subnet/%s/managed?limit=1&offset=0" % zone_id
+        result = requests.get(zone_url, headers=self.headers, verify=False)
+        list_zone_settings = json.loads(result.text)
+        list_zone_settings = list_zone_settings['result']
+        del list_zone_settings[0]['id']
+        del list_zone_settings[0]['tunnel_switch_domain']
+        list_zone_settings[0]['network_prefix'] = network
+        managed_network_json = list_zone_settings[0]
+        add_managed_network_url = self.base_url + "api/v1/webpanel/subnet/%s/managed" % zone_id
+        result = requests.put(add_managed_network_url,
+                              json=managed_network_json,
+                              headers=self.headers, verify=False)
+        print (result.text)

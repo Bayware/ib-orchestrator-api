@@ -84,9 +84,7 @@ class IBOrchestratorAPI:
             tmp_token = json.loads(response.text)
             token = "Bearer " + tmp_token.get("token")
             self.headers.update({"Authorization": token})
-            print("Login successful")
         else:
-            print("Error login")
             raise LoginError()
 
     def add_domain(self, domain_json):
@@ -97,13 +95,11 @@ class IBOrchestratorAPI:
             response = requests.post(url_domain, json=domain_json, headers=self.headers, verify=False)
 
             if response.status_code == 200 or response.status_code == 201:
-                print("Domain %s - added" % domain_json['domain'])
+                return True
             else:
-                print("Error add domain (%s)" % domain_json['domain'])
-                print(response.text)
                 raise DomainError()
         else:
-            print("Domain %s - already created" % domain_json['domain'])
+            return True
 
     def add_user(self, user_json):
         url_user = self.base_url + URL_USER
@@ -113,13 +109,11 @@ class IBOrchestratorAPI:
                     d['user_domain'] == user_json['user_domain']) for d in tmp_users['result']):
             response = requests.post(url_user, json=user_json, headers=self.headers, verify=False)
             if response.status_code == 200 or response.status_code == 201:
-                print("User %s - added" % user_json['username'])
+                return True
             else:
-                print("Error add user (%s)" % user_json['username'])
-                print(response.text)
                 raise UserError()
         else:
-            print("User %s - already created" % user_json['username'])
+            return True
 
     def add_zone(self, zone_json):
         url = self.base_url + URL_CONTROLLER
@@ -141,13 +135,11 @@ class IBOrchestratorAPI:
         if not any(d['name'] == zone_json['name'] for d in tmp_zone['result']):
             response = requests.put(url_zone, json=zone_json, headers=self.headers, verify=False)
             if response.status_code == 200 or response.status_code == 201:
-                print("Zone '%s' - added" % zone_json['name'])
+                return True
             else:
-                print("Error add zone (%s)" % zone_json['name'])
-                print(response.text)
                 raise ZoneError()
         else:
-            print("Zone '%s' - already created" % zone_json['name'])
+            return True
 
     def add_managed_network(self, managed_network, zone=None, zone_id=None):
         if zone_id is None:
@@ -173,11 +165,9 @@ class IBOrchestratorAPI:
             if response.status_code == 200 or response.status_code == 201:
                 return True
             else:
-                print("Error add managed_network: %s" % managed_network)
-                print(response.text)
                 raise ManagedNetworkError()
         else:
-            print("managed_network already created")
+            return True
 
     def add_zone_managed_network(self, managed_network):
         url_subnet = self.base_url + URL_ZONE
@@ -221,7 +211,7 @@ class IBOrchestratorAPI:
                     if self.add_managed_network(managed_network=network, zone_id=zone_id):
                         cnt += 1
 
-        print("\t%s: Added %s networks" % (managed_network.get('subnet_id'), cnt))
+        return cnt
 
     def add_controller(self, controller_json):
         controller_json.update({"host_fqdn": self.hostname,
@@ -234,13 +224,11 @@ class IBOrchestratorAPI:
         if not any(d['name'] == controller_json['name'] for d in tmp_controllers['result']):
             response = requests.put(url, json=controller_json, headers=self.headers, verify=False)
             if response.status_code == 200 or response.status_code == 201:
-                print("Controller '%s' -  added" % controller_json['descr'])
+                return True
             else:
-                print("Error add controller")
-                print(response.text)
                 raise ControllerError()
         else:
-            print("Controller '%s' - already created" % controller_json['descr'])
+            return True
 
     def get_contrroler(self, **kwargs):
         url = self.base_url + URL_CONTROLLER
@@ -275,10 +263,9 @@ class IBOrchestratorAPI:
 
                     response = requests.post(url, json=modify_role, headers=self.headers, verify=False)
                     if response.status_code == 200 or response.status_code == 201:
-                        print("\tmodify template_role")
+                        return True
                     else:
-                        print("Error modify template_role")
-                        print(response.text)
+                        return False
 
     def add_template_roles(self, template_roles):
         url = self.base_url + URL_TEMPLATE_ROLE
@@ -290,13 +277,10 @@ class IBOrchestratorAPI:
         if not any(d['role_name'] == template_roles['role_name'] for d in tmp_template_roles['result']):
             response = requests.put(url, json=template_roles, headers=self.headers, verify=False)
             if response.status_code == 200 or response.status_code == 201:
-                print("\tadd template_role")
+                return True
             else:
-                print("Error add template_role")
-                print(response.text)
                 raise ServiceTemplateRoleError()
         else:
-            print("\ttemplate role already created")
             self.modify_service_template_role(template_roles, tmp_template_roles)
 
     def modify_service_template(self, service_template, tmp_templates):
@@ -318,13 +302,11 @@ class IBOrchestratorAPI:
                     response = requests.post(url, json=service_template,
                                              headers=self.headers, verify=False)
                     if response.status_code == 200 or response.status_code == 201:
-                        print("template modify")
+                        return True
                     else:
-                        print("Error template modify")
-                        print(service_template)
-                        print(response.text)
+                        return False
                 else:
-                    print("no data to modify")
+                    return True
 
     def add_service_template(self, service_template):
         url = self.base_url + URL_TEMPLATE
@@ -349,13 +331,9 @@ class IBOrchestratorAPI:
             if response.status_code == 200 or response.status_code == 201:
                 d = json.loads(response.text)
                 template_id = d['id']
-                print("Template '%s' - added" % service_template['service_name'])
             else:
-                print("Error add template (%s)" % service_template['service_name'])
-                print(response.text)
                 raise ServiceTemplateError()
         else:
-            print("Template '%s' already created" % service_template['service_name'])
             for tmp_template in tmp_templates['result']:
                 if tmp_template['service_name'] == service_template['service_name']:
                     template_id = tmp_template['id']
@@ -400,7 +378,7 @@ class IBOrchestratorAPI:
                         "endpoint_rules": service_role.get("endpoint_rules", ""),
                         "program_data_params": service_role.get("program_data_params", ""),
                         "endpoint_params": service_role.get("endpoint_params", ""),
-                        "token_params": service_role.get("token_params", "")})  # auth params
+                        "token_params": service_role.get("token_params", "")})
 
             for key, value in tmp_contract_role.items():
                 if value is None or value == '' or value == []:
@@ -419,13 +397,11 @@ class IBOrchestratorAPI:
 
             response = requests.put(url, json=contract_role, headers=self.headers, verify=False)
             if response.status_code == 200 or response.status_code == 201:
-                print("\tcontract_role add")
+                return True
             else:
-                print("\terror add contract_role")
-                print(response.text)
                 raise ContractError()
         else:
-            print("\tcontract_role already created")
+            return True
 
     def add_contracts(self, contract):
         dict_domain = self.get_domain_list()
@@ -433,13 +409,11 @@ class IBOrchestratorAPI:
         contract_domain_id = ''
 
         for domain in dict_domain['result']:
-            # print(domain)
             if domain['domain'] == contract['domain']:
                 contract_domain_id = domain['id']
         domain_name = contract["domain"]
         contract_service_id = ''
         for service in dict_service['result']:
-            # print(service)
             if service['service_name'] == contract["serviceName"]:
                 contract_service_id = service['id']
 
@@ -457,19 +431,12 @@ class IBOrchestratorAPI:
             resp = json.loads(response.text)
             if response.status_code == 200 or response.status_code == 201:
                 contract_id = resp["id"]
-                print("Contract '%s' - added" % contract['name'])
-                # print(response.text)
             else:
-                print("      error add contract (%s)" % contract['name'])
-                print(response.text)
                 raise ContractRoleError()
         else:
-            print("Contract '%s' - already created" % contract['name'])
             for d in tmp["result"]:
                 if d["name"] == contract["name"]:
                     contract_id = d["id"]
-
-        # print(contract_id)
         for contract_role in contract_roles:
             contract_role['topic_id'] = contract_id
             self.add_contracts_role(contract_role=contract_role,
@@ -485,12 +452,11 @@ class IBOrchestratorAPI:
 
             response = requests.put(url, json=link_json, headers=self.headers, verify=False)
             if response.status_code == 200 or response.status_code == 201:
-                print("Link from  '%s' to '%s' - add" % (link_json["node_a"], link_json["node_z"]))
+                return True
             else:
-                print("      error add link")
-                print(response.text)
+                raise ConfigureLinkError()
         else:
-            print("Link from  '%s' to '%s' - already created" % (link_json["node_a"], link_json["node_z"]))
+            return True
 
     def get_all_subnet(self):
         """GET all subnets from controller"""
@@ -526,7 +492,7 @@ class IBOrchestratorAPI:
         list_zone_settings[0]['network_prefix'] = network
         managed_network_json = list_zone_settings[0]
         add_managed_network_url = self.base_url + "api/v1/webpanel/subnet/%s/managed" % zone_id
-        result = requests.put(add_managed_network_url,
-                              json=managed_network_json,
-                              headers=self.headers, verify=False)
+        requests.put(add_managed_network_url,
+                     json=managed_network_json,
+                     headers=self.headers, verify=False)
         return True

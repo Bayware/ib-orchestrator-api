@@ -49,7 +49,8 @@ class IBOrchestratorAPI:
         address = ''
         if not result:
             address = socket.gethostbyname(hostname)
-
+        else:
+            address = hostname
         return address
 
     def get_domain_list(self):

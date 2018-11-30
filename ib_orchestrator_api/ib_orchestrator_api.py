@@ -381,9 +381,10 @@ class IBOrchestratorAPI:
                         "endpoint_params": service_role.get("endpoint_params", ""),
                         "token_params": service_role.get("token_params", "")})
 
-            for key, value in tmp_contract_role.items():
-                if value is None or value == '' or value == []:
-                    del tmp_contract_role[key]
+            tmp_dict = {key: value for key, value in tmp_contract_role.items() 
+                        if value is None or value == '' or value == []}
+            for key, value in tmp_dict.items():
+                del tmp_contract_role[key]
             contract_role.update(tmp_contract_role)
 
             result = requests.get(url_user, verify=False, headers=self.headers)

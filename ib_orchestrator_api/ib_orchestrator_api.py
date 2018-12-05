@@ -458,7 +458,7 @@ class IBOrchestratorAPI:
             else:
                 raise ConfigureLinkError()
         else:
-            return True
+            return False
 
     def get_all_subnet(self):
         """GET all subnets from controller"""

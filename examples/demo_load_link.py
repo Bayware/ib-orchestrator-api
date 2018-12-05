@@ -30,7 +30,7 @@ if __name__ == '__main__':
         link = {
             "node_a": "aws-p3",
             "domain_id_a": domain_id_a,
-            "node_z": "aws-p3",
+            "node_z": "aws-p1",
             "domain_id_z": domain_id_z,
             "admin_status": True,
             "ipsec_enable": True,

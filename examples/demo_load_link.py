@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from argparse import ArgumentParser
-from ib_orchestrator_api import IBOrchestartorAPI, IceBreakerError
+from ib_orchestrator_api import IBOrchestratorAPI, IceBreakerError
 
 if __name__ == '__main__':
     parser = ArgumentParser(description="HOSTNAME CONFIG")
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     base_url = "https://%s/" % options.hostname
     print("base_url: %s\n" % base_url)
 
-    ib_api = IBOrchestartorAPI(hostname=options.hostname,
+    ib_api = IBOrchestratorAPI(hostname=options.hostname,
                                domain=options.domain,
                                login=options.login,
                                password=options.password,
@@ -30,12 +30,16 @@ if __name__ == '__main__':
         link = {
             "node_a": "aws-p3",
             "domain_id_a": domain_id_a,
-            "node_z": "aws-p3",
+            "node_z": "aws-p1",
             "domain_id_z": domain_id_z,
             "admin_status": True,
             "ipsec_enable": True,
             "tunnel_ip_type": 1
         }
-        ib_api.configured_link(link)
+        result = ib_api.configured_link(link)
+        if result:
+            print("Link from  '%s' to '%s' - add" % (link["node_a"], link["node_z"]))
+        else:
+            print("Link from  '%s' to '%s' - already created" % (link["node_a"], link["node_z"]))
     except IceBreakerError as error:
         print(error.error_message)

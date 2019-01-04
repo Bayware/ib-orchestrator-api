@@ -5,6 +5,7 @@ import json
 import re
 import socket
 import warnings
+import hashlib
 from .errors import *
 
 try:
@@ -24,6 +25,8 @@ URL_ZONE = "api/v1/webpanel/subnet"
 URL_TEMPLATE = "api/v1/webpanel/servicetempl"
 URL_TEMPLATE_ROLE = "api/v1/webpanel/servicetemplaterole"
 URL_CONFIGURE_LINK = "api/v1/webpanel/configured_link"
+URL_RESOURCE_USER = "api/v1/webpanel/resource_user"
+URL_RESOURCE_ROLE = "api/v1/webpanel/resource_role"
 
 
 class IBOrchestratorAPI:
@@ -100,7 +103,7 @@ class IBOrchestratorAPI:
             else:
                 raise DomainError()
         else:
-            return True
+            return False
 
     def add_user(self, user_json):
         url_user = self.base_url + URL_USER
@@ -114,7 +117,63 @@ class IBOrchestratorAPI:
             else:
                 raise UserError()
         else:
+            return False
+    
+    def add_resource_user(self, resource_user_json):
+        url_resource_user = self.base_url + URL_RESOURCE_USER
+        result = requests.get(url_resource_user, verify=False, headers=self.headers)
+        tmp_users = json.loads(result.text)
+        url_resource_role = self.base_url + URL_RESOURCE_ROLE
+        result = requests.get(url_resource_role, verify=False, headers=self.headers)
+        tmp_roles = json.loads(result.text)
+
+        resource_user_roles = []
+        for roles in resource_user_json["roles"]:
+            for role in tmp_roles["result"]:
+                if roles == role["name"]:
+                    resource_user_roles.append(role['id'])
+        resource_user_json["roles"] = resource_user_roles
+        
+        dict_domain = self.get_domain_list()
+        for domain in dict_domain['result']:
+            if domain['domain'] == resource_user_json["user_domain"]:
+                domain_id = domain['id']
+                resource_user_json.update({"domain_id":domain_id})
+        del resource_user_json["user_domain"]
+
+        if not any((d['username'] == resource_user_json['username'] and
+                    d['domain_id'] == resource_user_json['domain_id']) for d in tmp_users['result']):
+            response = requests.put(url_resource_user, json=resource_user_json, headers=self.headers, verify=False)
+            if response.status_code == 200 or response.status_code == 201:
+                return True
+            else:
+                raise UserError()
+        else:
+            return False
+        
+        
+    def patch_resource_user(self, data):
+        url_resource_user = self.base_url + URL_RESOURCE_USER
+        # print(url_resource_user)
+        result = requests.get(url_resource_user, verify=False, headers=self.headers)
+        # print(result.text)
+        tmp_users = json.loads(result.text)
+        user_id = ''
+        for user in tmp_users['result']:
+            if user["username"] == data["username"]:
+                user_id = user['id']
+
+        url_resource_user = self.base_url + URL_RESOURCE_USER + "/" + str(user_id)
+        # print(url_resource_user)
+        
+        resource_user_json = {"password":data.get("password")}
+        # print(resource_user_json)
+        response = requests.patch(url_resource_user, json=resource_user_json, headers=self.headers, verify=False)
+        if response.status_code == 200:
             return True
+        else:
+            raise UserError()
+        
 
     def add_zone(self, zone_json):
         url = self.base_url + URL_CONTROLLER
@@ -140,7 +199,7 @@ class IBOrchestratorAPI:
             else:
                 raise ZoneError()
         else:
-            return True
+            return False
 
     def add_managed_network(self, managed_network, zone=None, zone_id=None):
         if zone_id is None:
@@ -168,7 +227,7 @@ class IBOrchestratorAPI:
             else:
                 raise ManagedNetworkError()
         else:
-            return True
+            return False
 
     def add_zone_managed_network(self, managed_network):
         url_subnet = self.base_url + URL_ZONE
@@ -229,7 +288,7 @@ class IBOrchestratorAPI:
             else:
                 raise ControllerError()
         else:
-            return True
+            return False
 
     def get_contrroler(self, **kwargs):
         url = self.base_url + URL_CONTROLLER
@@ -307,7 +366,7 @@ class IBOrchestratorAPI:
                     else:
                         return False
                 else:
-                    return True
+                    return False
 
     def add_service_template(self, service_template):
         url = self.base_url + URL_TEMPLATE
@@ -403,7 +462,7 @@ class IBOrchestratorAPI:
             else:
                 raise ContractError()
         else:
-            return True
+            return False
 
     def add_contracts(self, contract):
         dict_domain = self.get_domain_list()

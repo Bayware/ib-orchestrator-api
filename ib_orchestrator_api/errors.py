@@ -24,7 +24,7 @@ class IceBreakerError(Exception):
 
 
 class LoginError(IceBreakerError):
-    err_code = 400
+    err_code = 401
     error_message = 'Login Failed'
 
 

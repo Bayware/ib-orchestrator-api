@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='ib_orchestrator_api',
-      version='0.2.5',
+      version='0.2.6',
       description='Bayware Northbound API Library',
       classifiers=[
         'Development Status :: 3 - Alpha',

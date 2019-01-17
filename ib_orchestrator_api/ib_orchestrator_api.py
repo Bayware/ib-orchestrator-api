@@ -405,6 +405,94 @@ class IBOrchestratorAPI:
         else:
             return True
 
+    def modify_contract_role(self, contract_role_name=None, contract_name=None, domain_name=None, data=None):
+        url = self.base_url + URL_CONTRACT_ROLE
+        result = requests.get(url, verify=False, headers=self.headers)
+        tmp_roles = json.loads(result.text)
+        dict_domain = self.get_domain_list()
+        #print(dict_domain)
+        domain_id = self.get_domain_id(dict_domain['result'], domain_name)
+        #print(domain_id)
+        url_contracts = self.base_url + URL_CONTRACTS
+        result = requests.get(url_contracts, verify=False, headers=self.headers)
+        topics = json.loads(result.text)
+        #print(json.loads(result.text))
+        topic_id = ''
+        for topic in topics['result']:
+            if topic['name'] == contract_name and topic['domain_id'] == domain_id:
+                topic_id = topic['id']
+                break
+
+        if not topic_id:
+            message = "wrong modify contract_role - contract '%s' in domain '%s' does not exist" % (
+                contract_name, domain_name)
+            raise ContractError(error_message=message)
+        #print(topic_id)
+        modify_role = {}
+        for role in tmp_roles['result']:
+            if role['role_name'] == contract_role_name and role['topic_id'] == topic_id:
+                modify_role = role
+                break
+                
+        if not modify_role:
+            message = "wrong modify contract_role -  contract role '%s' in domain '%s' does not exist" % (
+                contract_role_name, domain_name)
+            raise ContractError(error_message=message)
+        
+        topic_role_id = modify_role['id']
+        modify_url = url + '/' + str(topic_role_id)
+        #print(modify_url)
+        
+        modify_role.update(data)
+        response = requests.post(modify_url, json=modify_role, verify=False, headers=self.headers)
+        if response.status_code == 200 or response.status_code == 201:
+            return True
+        else:
+            raise ContractError()
+        
+
+    def delete_contract_role(self, contract_role_name=None, contract_name=None, domain_name=None):
+        url = self.base_url + URL_CONTRACT_ROLE
+        result = requests.get(url, verify=False, headers=self.headers)
+        tmp_roles = json.loads(result.text)
+        dict_domain = self.get_domain_list()
+        #print(dict_domain)
+        domain_id = self.get_domain_id(dict_domain['result'], domain_name)
+        #print(domain_id)
+        url_contracts = self.base_url + URL_CONTRACTS
+        result = requests.get(url_contracts, verify=False, headers=self.headers)
+        topics = json.loads(result.text)
+        
+
+        topic_id = ''
+        for topic in topics['result']:
+            if topic['name'] == contract_name and topic['domain_id'] == domain_id:
+                topic_id = topic['id']
+                break
+        
+        if not topic_id:
+            message = "wrong delete contract_role - contract '%s' in domain '%s' does not exist" % (
+                contract_name, domain_name)
+            raise ContractError(error_message=message)
+
+        topic_role_id = ''
+        for role in tmp_roles['result']:
+            if role['role_name'] == contract_role_name and role['topic_id'] == topic_id:
+                topic_role_id = role['id']
+                break
+        
+        if not topic_role_id:
+            message = "wrong delete contract_role -  contract role '%s' in domain '%s' does not exist" % (
+                contract_role_name, domain_name)
+            raise ContractError(error_message=message)
+        
+        delete_url = url + '/' + str(topic_role_id)
+        response = requests.delete(delete_url, verify=False, headers=self.headers)
+        if response.status_code == 200 or response.status_code == 201:
+            return True
+        else:
+            raise ContractError()
+
     def add_contracts(self, contract):
         dict_domain = self.get_domain_list()
         dict_service = self.get_service_list()

@@ -24,21 +24,9 @@ if __name__ == '__main__':
     try:
         ib_api.authorization()
 
-        data =  {"program_data_params":	None,
-                 "role_name": "client",
-                 "send_pkt_interval":	5,
-                 "service_params": None,
-                 'endpoint_rules': {'test_enpdoint': [{}], 'egress': [{}]},
-                 }
-
         contract_role_name = "client"
         contract_name = "frontend" 
         domain_name = "getaway-app"
-        result = ib_api.modify_contract_role(contract_role_name=contract_role_name,contract_name=contract_name,domain_name=domain_name, data=data)
-        if result:
-            print("Contract role  '%s' - modify" % contract_role_name)
-        else:
-            print("Contract role  '%s' - not modify" % contract_role_name)
 
         result = ib_api.delete_contract_role(contract_role_name=contract_role_name,contract_name=contract_name,domain_name=domain_name)
         if result:

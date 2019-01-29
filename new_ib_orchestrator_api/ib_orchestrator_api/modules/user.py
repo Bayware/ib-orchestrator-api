@@ -3,7 +3,7 @@ import requests
 from ib_orchestrator_api.core.core import Core
 from ib_orchestrator_api.core.errors import UserError, UserInControllerError
 from .domain import Domain
-from .utils import *
+from ib_orchestrator_api.core.utils import *
 
 class User(Core):
     def __init__(self, first_name=None, is_active=None, password=None, repeat_password=None, roles=None, 
@@ -107,10 +107,10 @@ class User(Core):
             if value is None or value == '':
                 message = "Field '%s' can't be None" % str(key)
 
-                #print(message)
-                #print(str(key), value)
+                # print(message)
+                # print(str(key), value)
                 raise UserError(error_message=message)
-        #print(self.user_domain)
+        # print(self.user_domain)
         data.update({'user_domain':self.user_domain.domain})
         return data
 

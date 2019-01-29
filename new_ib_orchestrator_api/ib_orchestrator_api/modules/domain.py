@@ -1,8 +1,6 @@
-import requests
 from ib_orchestrator_api.core.core import Core
 from ib_orchestrator_api.core.errors import DomainError, DomainNameError, DomainIDError, DomainInControllerError
-from ib_orchestrator_api.core import ib_core
-from .utils import *
+from ib_orchestrator_api.core.utils import *
 
 
 
@@ -28,12 +26,14 @@ class Domain(Core):
          'domain_type': 'Application'}
 
         """
+       
         domain_json = self.to_dict()
+        del domain_json['_id']
         for key,value in domain_json.items():
             if not value:
                 message = "Field '%s' can't be None" % str(key)
                 print(message)
-        del domain_json['_id']
+        
 
         return domain_json
 
@@ -99,8 +99,8 @@ class Domain(Core):
         if not result_domain:
             message = "Domain '%s' not found " % domain_name
             # print(message)
-            return None
-            # raise DomainNameError(error_message=message)
+            # return None
+            raise DomainNameError(error_message=message)
         # print(result_domain)
         domain = Domain(url=self.url, session=self.session)
         for field in result_domain.keys():

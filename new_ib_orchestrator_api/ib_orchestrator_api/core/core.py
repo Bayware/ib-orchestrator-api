@@ -1,4 +1,3 @@
-
 class Core():
     def to_dict(self):
         data = (vars(self)).copy()

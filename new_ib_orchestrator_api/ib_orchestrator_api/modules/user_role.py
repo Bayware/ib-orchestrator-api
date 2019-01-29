@@ -1,5 +1,5 @@
 from ib_orchestrator_api.core.core import Core
-from .utils import *
+from ib_orchestrator_api.core.utils import *
 
 class UserRole(Core):
     def __init__(self, name=None, url=None, session=None):

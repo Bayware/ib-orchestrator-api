@@ -1,32 +1,19 @@
-import requests
 from ib_orchestrator_api.core.core import Core
 from ib_orchestrator_api.core.errors import UserError
 from .domain import Domain
 from .resource_role import ResourceRole
-from .utils import *
+from ib_orchestrator_api.core.utils import *
 
-"""
-"resource_user":[
-        {
-            "is_active": true,
-            "password": "workerpass",
-            "role": "hostOwner",
-            "role_id":0,
-            "user_domain":"getaway-app",
-            "username":	"worker"
-        }
-"""
 
 class ResourceUser(Core):
-    def __init__(self, username=None, domain=None, role=None, password=None, is_active=False, url=None, session=None):
+    def __init__(self, username=None, user_domain=None, role=None, role_id=None, password=None, is_active=False, url=None, session=None):
         self._id = None
         self.username = username
-        
         self.password = password
         self.is_active = False
         self.url = url 
         self.session = session
-        self.domain = self._get_user_domain(domain)
+        self.user_domain = self._get_user_domain(user_domain)
         self.role = self._get_resource_user_role(role)
         self.role_id = self._get_resource_user_role_id()
         
@@ -58,9 +45,68 @@ class ResourceUser(Core):
             return None
         else:
             return self.role._id
+        
+    def _get_dict_resource_user(self, username=None, domain=None):
+        if not domain:
+            domain = self.user_domain
+        if not username:
+            username = self.username
+
+        tmp_users = self.get_all_resource_user()
+        result_user = ''
+        for user in tmp_users['result']:
+            if user["username"] == username and user["domain_id"] == domain._id:
+                result_user = user
+                break
+        
+        return result_user
+    
+    def _check_self_resource_user(self):
+        result_user = self._get_dict_resource_user()
+        if not result_user:
+            return False
+        else:
+            self._id = result_user.get('id')
+            return True
 
     def _make_json(self):
-        pass
+        """
+        Example JSON
+        {'is_active': True, 
+        'password': 'kv-worker1pass', 
+        'role_id': 1, 
+        'username': 'kv-worker1', 
+        'domain_id': 2}
+        """
+        data = self.to_dict()
+        if "_id" in data.keys():
+            del data['_id']
+        for key, value in data.items():
+            if value is None or value == '':
+                message = "Field '%s' can't be None" % str(key)
+
+                #print(message)
+                #print(str(key), value)
+                raise UserError(error_message=message)
+        #print(self.user_domain)
+        if "user_domain" in data.keys():
+            del data['user_domain']
+        if "role" in data.keys():
+            del data['role']
+        data.update({'domain_id':self.user_domain._id})
+        return data
+    
+    def to_dict(self):
+        data = (vars(self)).copy()
+        if 'url' in data.keys():
+            del data['url']
+        if 'session' in data.keys():
+            del data['session']
+
+        for key, value in data.items():
+            if isinstance(getattr(self,key), Core):
+                data.update({key:value.to_dict()})
+        return data
 
         
 
@@ -113,10 +159,9 @@ class ResourceUser(Core):
             "username":	"worker"
         },
         """
-        resource_user_json = self.to_dict()
-        self.get_resource_user()
+        resource_user_json = self._make_json()
         url = self._get_resource_user_url()
-        if not self._id:
+        if not self._check_self_resource_user():
             response = self.session.put(url, json=resource_user_json, verify=False)
             if response.status_code == 200 or response.status_code == 201:
                 self._id = (json.loads(response.text)).get('id')
@@ -157,5 +202,30 @@ class ResourceUser(Core):
         else:
             raise UserError()
 
-    def delete_resource_user(self, domain_name=None):
-        pass
+    def delete_resource_user(self, resource_user_name=None, domain_name=None):
+        if not resource_user_name:
+            resource_user_name = self.username
+        if not domain_name:
+            domain_name = self.user_domain
+        else:
+            if not isinstance(domain_name, Domain):
+                domain_name = Domain(url=self.url, session=self.session).get_domain(domain_name)
+                return domain_name
+            else:
+                return domain_name
+        
+        result = self._get_dict_resource_user(username=resource_user_name, domain=domain_name)
+        domain_id = ''
+        if not result:
+            print("netu usera")
+        else:
+            domain_id = result.get('id')
+        
+        delete_url = self._get_resource_user_url() + '/' + str(domain_id)
+        response = self.session.delete(delete_url, verify=False)
+        #print(response)
+        #print(response.text)
+        if response.status_code == 200 or response.status_code == 204:
+            return True
+        else:
+            return False

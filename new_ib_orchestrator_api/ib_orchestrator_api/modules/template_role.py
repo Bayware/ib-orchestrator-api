@@ -36,7 +36,7 @@ class TemplateRole(Core):
                     return int(service_templ_id)
                 else:
                     message = "Wrong Value"
-                    raise SubnetError(error_message=message)
+                    raise ServiceTemplateRoleError(error_message=message)
             else:
                 service_templ_id = Template(url=self.url, session=self.session).get_template_id(service_templ_id)
                 return int(service_templ_id)

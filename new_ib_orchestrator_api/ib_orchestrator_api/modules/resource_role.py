@@ -1,14 +1,16 @@
 from ib_orchestrator_api.core.core import Core
+from ib_orchestrator_api.core.errors import ResourceRoleError
 from ib_orchestrator_api.core.utils import *
 
 class ResourceRole(Core):
-    def __init__(self, name=None, url=None, session=None):
-        self._id = None
+    def __init__(self, url, session, id=None, name=None):
+        self.id = id
         self.name = name
         self.url = url
         self.session = session
 
     def _get_resource_role_url(self):
+        """Internal class method: return url which is used for get, create, update, delete resource role"""
         return self.url + URL_RESOURCE_ROLE
     
     def get_all_resource_role(self):
@@ -30,12 +32,14 @@ class ResourceRole(Core):
 
         if not resource_role:
             message = 'not resource_role'
-            print(message)
+            raise ResourceRoleError(error_message=message)
         
-        role = ResourceRole()
+        role = ResourceRole(url=self.url, session=self.session)
         for field in resource_role.keys():
             if field == 'id':
-                setattr(role, '_id', resource_role[field])
+                setattr(role, 'id', resource_role[field])
             if field in vars(role).keys():
                 setattr(role, field, resource_role[field])
         return role
+
+    

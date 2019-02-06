@@ -95,3 +95,15 @@ class ContractRoleError(IceBreakerError):
 class ConfigureLinkError(IceBreakerError):
     err_code = 400
     error_message = 'Configure link add error'
+
+class ResourceRoleError(IceBreakerError):
+    err_code = 400
+    error_message = 'Resource Role error'
+
+class ResourceUserError(IceBreakerError):
+    err_code = 400
+    error_message = "Resource User error"
+
+class SubnetError(IceBreakerError):
+    err_code = 400
+    error_message = "Subnet error"

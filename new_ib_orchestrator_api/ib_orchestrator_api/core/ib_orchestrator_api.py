@@ -9,19 +9,23 @@ import hashlib
 import itertools
 from .errors import *
 from .core import Core
-from ib_orchestrator_api.modules import *
 from .utils import *
+try:
+    from ib_orchestrator_api.modules import *  # for Python 3
+except ImportError:
+    from ..modules import * # for Python 2
 
 try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
 
-
 warnings.filterwarnings('ignore')
+
+
 # logging.basicConfig(filename='example.log', level=logging.DEBUG)
 
-        
+
 class IBOrchestratorAPI(Core):
     def __init__(self, hostname, login, password, base_url, domain='default'):
         self.hostname = hostname
@@ -32,27 +36,38 @@ class IBOrchestratorAPI(Core):
         self.headers = {'Content-Type': 'application/json'}
         self.ip_address = self.get_ip_address(hostname)
         self.session = None
-        
-    
+
     def domain(self, **kwargs):
         domain = Domain(url=self.base_url, session=self.session, **kwargs)
         return domain
-    
+
     def controller(self, **kwargs):
         controller = Controller(url=self.base_url, session=self.session, **kwargs)
-        return domain
+        return controller
 
     def user(self, **kwargs):
-        domain = Domain(url=self.base_url, session=self.session, **kwargs)
-        return domain  
+        user = User(url=self.base_url, session=self.session, **kwargs)
+        return user
 
     def resource_user(self, **kwargs):
         resource_user = ResourceUser(url=self.base_url, session=self.session, **kwargs)
         return resource_user
-    
+
     def resource_role(self, **kwargs):
         resource_role = ResourceRole(url=self.base_url, session=self.session, **kwargs)
         return resource_role
+
+    def zone(self, **kwargs):
+        zone = Zone(url=self.base_url, session=self.session, **kwargs)
+        return zone
+
+    def subnet(self, **kwargs):
+        subnet = Subnet(url=self.base_url, session=self.session, **kwargs)
+        return subnet
+
+    def template(self, **kwargs):
+        template = Template(url=self.base_url, session=self.session, **kwargs)
+        return template
 
     @staticmethod
     def read_from_json(filename):
@@ -70,7 +85,6 @@ class IBOrchestratorAPI(Core):
         else:
             address = hostname
         return address
-
 
     def get_domain_list(self):
         url_domain = self.base_url + URL_DOMAIN
@@ -107,7 +121,7 @@ class IBOrchestratorAPI(Core):
             self.headers.update({"Authorization": token})
         else:
             raise LoginError()
-    
+
     def authorization(self):
         session = requests.session()
         token_url = self.base_url + "api/v1/webpanel/token"
@@ -123,6 +137,8 @@ class IBOrchestratorAPI(Core):
                                     'Content-Type': 'application/json'})
             self.session = session
         else:
+            print(response)
+            print(response.text)
             raise LoginError()
 
     def add_domain(self, domain_json):
@@ -150,7 +166,7 @@ class IBOrchestratorAPI(Core):
             if response.status_code == 200 or response.status_code == 201:
                 return True
             else:
-                message = "Error add user '%s' in domain '%s' " % (user_json['username'], user_json['user_domain'] )
+                message = "Error add user '%s' in domain '%s' " % (user_json['username'], user_json['user_domain'])
                 raise UserError(error_message=message)
         else:
             return False
@@ -193,7 +209,6 @@ class IBOrchestratorAPI(Core):
                 raise UserError(error_message=message)
         else:
             return False
-
 
     def patch_resource_user(self, resource_user_json):
         url_resource_user = self.base_url + URL_RESOURCE_USER
@@ -494,10 +509,10 @@ class IBOrchestratorAPI(Core):
 
             tmp_dict = {key: value for key, value in tmp_contract_role.items()
                         if value is None or value == '' or value == []}
-            
+
             for key, value in tmp_dict.items():
                 del tmp_contract_role[key]
-        
+
             contract_role.update(tmp_contract_role)
             result = self.session.get(url_user, verify=False)
             domain_users = json.loads(result.text)
@@ -516,20 +531,19 @@ class IBOrchestratorAPI(Core):
                 raise ContractError()
         else:
             return False
-        
-    
+
     def modify_contract_role(self, contract_role_name=None, contract_name=None, domain_name=None, data=None):
         url = self.base_url + URL_CONTRACT_ROLE
         result = self.session.get(url, verify=False)
         tmp_roles = json.loads(result.text)
         dict_domain = self.get_domain_list()
-        #print(dict_domain)
+        # print(dict_domain)
         domain_id = self.get_domain_id(dict_domain['result'], domain_name)
-        #print(domain_id)
+        # print(domain_id)
         url_contracts = self.base_url + URL_CONTRACTS
         result = self.session.get(url_contracts, verify=False)
         topics = json.loads(result.text)
-        #print(json.loads(result.text))
+        # print(json.loads(result.text))
         topic_id = ''
         for topic in topics['result']:
             if topic['name'] == contract_name and topic['domain_id'] == domain_id:
@@ -540,49 +554,47 @@ class IBOrchestratorAPI(Core):
             message = "wrong modify contract_role - contract '%s' in domain '%s' does not exist" % (
                 contract_name, domain_name)
             raise ContractError(error_message=message)
-        #print(topic_id)
+        # print(topic_id)
         modify_role = {}
         for role in tmp_roles['result']:
             if role['role_name'] == contract_role_name and role['topic_id'] == topic_id:
                 modify_role = role
                 break
-                
+
         if not modify_role:
             message = "wrong modify contract_role -  contract role '%s' in domain '%s' does not exist" % (
                 contract_role_name, domain_name)
             raise ContractError(error_message=message)
-        
+
         topic_role_id = modify_role['id']
         modify_url = url + '/' + str(topic_role_id)
-        #print(modify_url)
-        
+        # print(modify_url)
+
         modify_role.update(data)
         response = self.session.post(modify_url, json=modify_role, verify=False)
         if response.status_code == 200 or response.status_code == 201:
             return True
         else:
             raise ContractError()
-        
 
     def delete_contract_role(self, contract_role_name=None, contract_name=None, domain_name=None):
         url = self.base_url + URL_CONTRACT_ROLE
         result = self.session.get(url, verify=False)
         tmp_roles = json.loads(result.text)
         dict_domain = self.get_domain_list()
-        #print(dict_domain)
+        # print(dict_domain)
         domain_id = self.get_domain_id(dict_domain['result'], domain_name)
-        #print(domain_id)
+        # print(domain_id)
         url_contracts = self.base_url + URL_CONTRACTS
         result = self.session.get(url_contracts, verify=False)
         topics = json.loads(result.text)
-        
 
         topic_id = ''
         for topic in topics['result']:
             if topic['name'] == contract_name and topic['domain_id'] == domain_id:
                 topic_id = topic['id']
                 break
-        
+
         if not topic_id:
             message = "wrong delete contract_role - contract '%s' in domain '%s' does not exist" % (
                 contract_name, domain_name)
@@ -593,19 +605,19 @@ class IBOrchestratorAPI(Core):
             if role['role_name'] == contract_role_name and role['topic_id'] == topic_id:
                 topic_role_id = role['id']
                 break
-        
+
         if not topic_role_id:
             message = "wrong delete contract_role -  contract role '%s' in domain '%s' does not exist" % (
                 contract_role_name, domain_name)
             raise ContractError(error_message=message)
-        
+
         delete_url = url + '/' + str(topic_role_id)
         response = self.session.delete(delete_url, verify=False)
         if response.status_code == 200 or response.status_code == 201:
             return True
         else:
             raise ContractError()
-    
+
     def get_all_contracts(self):
         url = self.base_url + URL_CONTRACTS
         result = self.session.get(url, verify=False)
@@ -617,8 +629,8 @@ class IBOrchestratorAPI(Core):
         result = self.session.get(url, verify=False)
         all_contracts_role = json.loads(result.text)
         return all_contracts_role['result']
-    
-    def get_contact_id(self, all_contracts, contract_name):
+
+    def get_contract_id(self, all_contracts, contract_name):
         contract_id = ''
         for contract in all_contracts:
             if contract['name'] == contract_name:
@@ -649,14 +661,14 @@ class IBOrchestratorAPI(Core):
         topics = service.get("topic_roles")
         for topic in topics:
             topic_name = topic.get('topic_name')
-            contract_id = self.get_contact_id(all_contracts, topic_name)
+            contract_id = self.get_contract_id(all_contracts, topic_name)
             # print(contract_id)
-            topic_role_name = topic.get('topic_role_name') 
+            topic_role_name = topic.get('topic_role_name')
             contract_role_id = self.get_contracts_role_id(all_contracts_role, contract_id, topic_role_name)
             topic_role_id.append(int(contract_role_id))
-        
+
         del service["domain_name"]
-        service.update({"topic_roles":topic_role_id,
+        service.update({"topic_roles": topic_role_id,
                         "domain_id": domain_id})
         print(service)
         response = self.session.put(url, json=service, verify=False)
@@ -669,13 +681,20 @@ class IBOrchestratorAPI(Core):
         all_service = json.loads(result.text)
         return all_service['result']
     
+    def get_all_service_token(self, service_id=None):
+        url = self.base_url + "api/v1/webpanel/service/" + str(service_id) + "/token"
+        result = self.session.get(url, verify=False)
+        #print(result)
+        all_service_token = json.loads(result.text)
+        #print(all_service_token)
+        return all_service_token['result']
+
     def add_service_token(self, service_token):
-        url = self.base_url + "api/v1/webpanel/service_token"
         all_service = self.get_all_service()
         dict_domain = self.get_domain_list()
         domain_name = service_token.get("domain_name")
         domain_id = self.get_domain_id(dict_domain['result'], domain_name)
-        
+
         service_id = ''
         for service in all_service:
             if service['domain_id'] == domain_id and service['name'] == service_token["service_name"]:
@@ -684,11 +703,30 @@ class IBOrchestratorAPI(Core):
         service_token.update({"service_id": service_id})
         del service_token['service_name']
         del service_token['domain_name']
+        del service_token['service_id']
         print(service_token)
-        response = self.session.put(url, json=service_token, verify=False)
+        url = self.base_url + "api/v1/webpanel/service/" + str(service_id) + "/token"
+        #print(url)
+        all_service_token = self.get_all_service_token(service_id)
+
+        #url = self.base_url + "api/v1/webpanel/token"
+        #response = self.session.put(url, json=service_token, verify=False)
+        #print(response)
+        #print(response.text)
+        
+        if not any(t["token_ident"] == service_token["token_ident"] for t in all_service_token):
+            response = self.session.put(url, json=service_token, verify=False)
+            print(response)
+            print(response.text)
+        else:
+            print("token already create")
+    
+    def delete_service_token(self, service_id, token_id):
+        url = "https://dev.bayware.net/api/v1/webpanel/service/" + str(service_id) + "/token/" + str(token_id)
+        response = self.session.delete(url, verify=False)
         print(response)
         print(response.text)
-
+        
         
     def add_contracts(self, contract):
         dict_domain = self.get_domain_list()
@@ -785,5 +823,5 @@ class IBOrchestratorAPI(Core):
         managed_network_json = list_zone_settings[0]
         add_managed_network_url = self.base_url + "api/v1/webpanel/subnet/%s/managed" % zone_id
         self.session.put(add_managed_network_url,
-                     json=managed_network_json, verify=False)
+                         json=managed_network_json, verify=False)
         return True

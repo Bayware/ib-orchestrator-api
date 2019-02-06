@@ -6,12 +6,12 @@ from .domain import Domain
 from ib_orchestrator_api.core.utils import *
 
 class User(Core):
-    def __init__(self, first_name=None, is_active=None, password=None, repeat_password=None, roles=None, 
-                        user_auth_method=None, user_domain=None, username=None, url=None, session=None):
+    def __init__(self, url, session, id=None, first_name=None, is_active=None, password=None, repeat_password=None, roles=None, 
+                        user_auth_method=None, user_domain=None, username=None):
 
-        self._id = None
+        self._id = id
         self.first_name = first_name
-        self.is_active = is_active
+        self.is_active = is_active 
         self.password = password
         self.repeat_password = repeat_password
         self.user_auth_method = user_auth_method
@@ -22,6 +22,7 @@ class User(Core):
         self.roles = self._get_user_roles(roles)
 
     def _get_user_domain(self, user_domain=None):
+        """Method called when creating an instance of a class, initializes user domain attribute """
         if not user_domain:
             return None
         else:
@@ -32,6 +33,7 @@ class User(Core):
                 return user_domain
 
     def _get_user_roles(self, role=None):
+        """Method called when creating an instance of a class, initializes user role attribute """
         if not role:
             return None
         else:
@@ -43,6 +45,7 @@ class User(Core):
 
 
     def _get_user_url(self):
+        """Internal class method: return url which is used for get, create, update, delete user"""
         return self.url + URL_USER
     
     def _get_dict_user(self, username=None, domain=None):
@@ -61,6 +64,7 @@ class User(Core):
         return result_user
     
     def _check_self_user(self):
+        """Internal class method, checks if such an user exists on the server"""
         result_user = self._get_dict_user()
         if not result_user:
             return False
@@ -88,12 +92,12 @@ class User(Core):
     def _make_json(self):
         """
         Example JSON
-        {'first_name': 'User for autotests', 
+        {'first_name': 'User for tests', 
         'is_active': 'True', 
         'password': '12345', 
         'repeat_password': '12345', 
-        'roles': ['systemAdmin'], 
-        'user_auth_method': 'LocalAuth', 
+        'roles': ['testAdmin'], 
+        'user_auth_method': 'Local', 
         'user_domain': 'default', 
         'username': 'test'}
 
@@ -115,6 +119,7 @@ class User(Core):
         return data
 
     def to_dict(self):
+        """Base class override method. Representation of class attributes as dict"""
         data = (vars(self)).copy()
         if 'url' in data.keys():
             del data['url']
@@ -209,13 +214,13 @@ class User(Core):
             else:
                 return domain_name
         result = self._get_dict_user(username=username, domain=domain_name)
-        domain_id = ''
+        user_id = ''
         if not result:
             print("netu usera")
         else:
-            domain_id = result.get('id')
+            user_id = result.get('id')
         
-        delete_url = self._get_user_url() + '/' + str(domain_id)
+        delete_url = self._get_user_url() + '/' + str(user_id)
         response = self.session.delete(delete_url, verify=False)
         if response.status_code == 204:
             return True

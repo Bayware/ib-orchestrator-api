@@ -1,5 +1,5 @@
 from .errors import *
-from .ib_orchestrator_api import *
+from .ib_orchestrator_api import IBOrchestratorAPI
 from .core import Core
 from .utils import *
 

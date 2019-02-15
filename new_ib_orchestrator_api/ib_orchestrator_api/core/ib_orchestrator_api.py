@@ -10,10 +10,11 @@ import itertools
 from .errors import *
 from .core import Core
 from .utils import *
+
 try:
     from ib_orchestrator_api.modules import *  # for Python 3
 except ImportError:
-    from ..modules import * # for Python 2
+    from ..modules import *  # for Python 2
 
 try:
     from urllib.parse import urlparse
@@ -68,6 +69,23 @@ class IBOrchestratorAPI(Core):
     def template(self, **kwargs):
         template = Template(url=self.base_url, session=self.session, **kwargs)
         return template
+
+    def service(self, **kwargs):
+        service = Service(url=self.base_url, session=self.session, **kwargs)
+        return service
+
+    def contract(self, **kwargs):
+        contract = Contract(url=self.base_url, session=self.session, **kwargs)
+        return contract
+
+    def contract_role(self, **kwargs):
+        contract_role = ContractRole(url=self.base_url, session=self.session, **kwargs)
+        return contract_role
+
+    def link(self, **kwargs):
+        link = Link(url=self.base_url, session=self.session, **kwargs)
+        return link
+
 
     @staticmethod
     def read_from_json(filename):
@@ -253,8 +271,13 @@ class IBOrchestratorAPI(Core):
             if controller['name'] == zone_json["controller_sec_id"]:
                 controller_sec_id = str(controller['id'])
 
+        domain_name = zone_json.get("tunnel_switch_domain_id")
+        all_domains = self.get_domain_list()
+        domain_id = self.get_domain_id(all_domains['result'], domain_name)
+
         zone_json.update({"controller_pri_id": controller_pri_id,
-                          "controller_sec_id": controller_sec_id})
+                          "controller_sec_id": controller_sec_id,
+                          "tunnel_switch_domain_id": domain_id})
         url_zone = self.base_url + "api/v1/webpanel/subnet"
         result = self.session.get(url_zone, verify=False)
         tmp_zone = json.loads(result.text)
@@ -283,31 +306,47 @@ class IBOrchestratorAPI(Core):
                         return "you input invalid zone"
 
         url = self.base_url + "api/v1/webpanel/subnet/" + zone_id + "/managed"
-        managed_network.update({"subnet_id": zone_id})
+        managed_network.update({"subnet_id": int(zone_id)})
         result = self.session.get(url, verify=False)
         tmp_managed = json.loads(result.text)
+        #print(managed_network)
+        if 'network_files' in managed_network.keys():
+            del managed_network['network_files']
+        #print(managed_network)
+        #response = self.session.put(url, json=managed_network, verify=False)
+        # print(managed_network)
+
+        #if response.status_code == 200 or response.status_code == 201:
+            #return True
+       # else:
+            #raise ManagedNetworkError()
 
         if not any(d["network_prefix"] == managed_network["network_prefix"] for d in tmp_managed['result']):
             response = self.session.put(url, json=managed_network, verify=False)
+            # print(managed_network)
+            # print(response)
+            #print(response.text)
             if response.status_code == 200 or response.status_code == 201:
+
                 return True
             else:
                 raise ManagedNetworkError()
         else:
             return False
 
+
     def add_zone_managed_network(self, managed_network):
         url_subnet = self.base_url + URL_ZONE
         response_subnet = self.session.get(url_subnet, verify=False)
 
         dict_domain = self.get_domain_list()
-        domain_id = ""
-        for domain in dict_domain['result']:
-            if domain['domain'] == managed_network["tunnel_switch_domain_id"]:
-                domain_id = str(domain['id'])
+        # domain_id = ""
+        # for domain in dict_domain['result']:
+        # if domain['domain'] == managed_network["tunnel_switch_domain_id"]:
+        # domain_id = str(domain['id'])
 
-        if domain_id == "":
-            return DomainIDError()
+        # if domain_id == "":
+        # return DomainIDError()
 
         zone_id = ""
         dict_subnet = json.loads(response_subnet.text)
@@ -323,7 +362,7 @@ class IBOrchestratorAPI(Core):
                 network = managed_network
                 network["subnet_id"] = zone_id
                 network["network_prefix"] = prefix
-                network["tunnel_switch_domain_id"] = domain_id
+                # network["tunnel_switch_domain_id"] = domain_id
                 if self.add_managed_network(managed_network=network, zone_id=zone_id):
                     cnt += 1
 
@@ -334,7 +373,7 @@ class IBOrchestratorAPI(Core):
                     network = managed_network
                     network["subnet_id"] = zone_id
                     network["network_prefix"] = prefix
-                    network["tunnel_switch_domain_id"] = domain_id
+                    # network["tunnel_switch_domain_id"] = domain_id
                     if self.add_managed_network(managed_network=network, zone_id=zone_id):
                         cnt += 1
 
@@ -646,6 +685,12 @@ class IBOrchestratorAPI(Core):
                 break
         return contract_role_id
 
+    def get_all_service(self):
+        url = self.base_url + "api/v1/webpanel/service"
+        result = self.session.get(url, verify=False)
+        all_service = json.loads(result.text)
+        return all_service['result']
+
     def add_service(self, service):
 
         url = self.base_url + "api/v1/webpanel/service"
@@ -670,23 +715,26 @@ class IBOrchestratorAPI(Core):
         del service["domain_name"]
         service.update({"topic_roles": topic_role_id,
                         "domain_id": domain_id})
-        print(service)
-        response = self.session.put(url, json=service, verify=False)
-        print(response)
-        print(response.text)
 
-    def get_all_service(self):
-        url = self.base_url + "api/v1/webpanel/service"
-        result = self.session.get(url, verify=False)
-        all_service = json.loads(result.text)
-        return all_service['result']
-    
+        all_service = self.get_all_service()
+
+        print("SERVICE")
+        print(service)
+        if not any(s["name"] == service["name"] for s in all_service):
+            print(service)
+            response = self.session.put(url, json=service, verify=False)
+            print(response)
+            print(response.text)
+        else:
+            print("service already create")
+
+
     def get_all_service_token(self, service_id=None):
         url = self.base_url + "api/v1/webpanel/service/" + str(service_id) + "/token"
         result = self.session.get(url, verify=False)
-        #print(result)
+        # print(result)
         all_service_token = json.loads(result.text)
-        #print(all_service_token)
+        # print(all_service_token)
         return all_service_token['result']
 
     def add_service_token(self, service_token):
@@ -706,28 +754,28 @@ class IBOrchestratorAPI(Core):
         del service_token['service_id']
         print(service_token)
         url = self.base_url + "api/v1/webpanel/service/" + str(service_id) + "/token"
-        #print(url)
+        # print(url)
         all_service_token = self.get_all_service_token(service_id)
 
-        #url = self.base_url + "api/v1/webpanel/token"
-        #response = self.session.put(url, json=service_token, verify=False)
-        #print(response)
-        #print(response.text)
-        
+        # url = self.base_url + "api/v1/webpanel/token"
+        # response = self.session.put(url, json=service_token, verify=False)
+        # print(response)
+        # print(response.text)
+        print("SERVICE_TOKEN")
+        print(service_token)
         if not any(t["token_ident"] == service_token["token_ident"] for t in all_service_token):
             response = self.session.put(url, json=service_token, verify=False)
             print(response)
             print(response.text)
         else:
             print("token already create")
-    
+
     def delete_service_token(self, service_id, token_id):
         url = "https://dev.bayware.net/api/v1/webpanel/service/" + str(service_id) + "/token/" + str(token_id)
         response = self.session.delete(url, verify=False)
         print(response)
         print(response.text)
-        
-        
+
     def add_contracts(self, contract):
         dict_domain = self.get_domain_list()
         dict_service = self.get_service_list()

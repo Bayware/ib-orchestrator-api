@@ -107,3 +107,7 @@ class ResourceUserError(IceBreakerError):
 class SubnetError(IceBreakerError):
     err_code = 400
     error_message = "Subnet error"
+
+class ServiceError(IceBreakerError):
+    err_code = 400
+    error_message = "ServiceError"

@@ -1,0 +1,54 @@
+{
+  "serviceName" : "client-server multipoint",
+  "serviceDescription" : "Point-to-multipoint with rendezvous point",
+  "roles" : [ {
+    "roleName" : "Client",
+    "roleDescription" : "Sends packets to servers subscribed at rendezvous point",
+    "permission" : 576,
+    "code" : "449C0010069300D78463014000EF40DCCD1C00100793C15C9002030000EF00672783409400D7846301A000EF00100793C49C40DCCD1C00100793C15C900200A000EF4F1CCD5C900200000000",
+    "codeMap" : {
+      "pub" : 0
+    },
+    "path" : null,
+    "endpointRules" : {
+      "ingress" : [ { } ],
+      "egress" : [ { } ]
+    },
+    "variables" : {
+      "ppl" : 0,
+      "params" : [ {
+        "name" : "topicSwitchTag",
+        "value" : 10
+      }, {
+        "name" : "forwardType",
+        "value" : 1
+      }, {
+        "name" : "byPub",
+        "value" : 0
+      } ]
+    }
+  }, {
+    "roleName" : "Server",
+    "roleDescription" : "Subscribes to client packets at rendezvous point",
+    "permission" : 576,
+    "code" : "40DC0010069300D7846300E000EF4F1CCD5C900202A000EF00672783409400D7846300E000EF00100793C0DC006000EF000000004B5CDD5C4F1CCD5C90020000",
+    "codeMap" : {
+      "subs" : 0
+    },
+    "path" : null,
+    "endpointRules" : {
+      "ingress" : [ { } ],
+      "egress" : [ { } ]
+    },
+    "variables" : {
+      "ppl" : 0,
+      "params" : [ {
+        "name" : "topicSwitchTag",
+        "value" : 10
+      }, {
+        "name" : "justForward",
+        "value" : 0
+      } ]
+    }
+  } ]
+}

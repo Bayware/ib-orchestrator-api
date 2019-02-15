@@ -1,0 +1,9 @@
+user:
+-   first_name: "Test domain admin"
+    is_active:  "True"
+    password: "12345"
+    repeat_password: "12345"
+    roles: ["domainAdmin"]
+    user_auth_method: "LocalAuth"
+    user_domain: "getaway-app"
+    username: "testAdmin"

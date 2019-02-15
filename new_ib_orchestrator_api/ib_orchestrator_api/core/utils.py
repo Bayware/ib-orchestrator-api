@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import requests
-import json
 import re
 import socket
 import warnings
-import hashlib
-import itertools
+import yaml
+
 
 try:
     from urllib.parse import urlparse
@@ -28,6 +26,7 @@ URL_TEMPLATE_ROLE = "api/v1/webpanel/servicetemplaterole"
 URL_CONFIGURE_LINK = "api/v1/webpanel/configured_link"
 URL_RESOURCE_USER = "api/v1/webpanel/resource_user"
 URL_RESOURCE_ROLE = "api/v1/webpanel/resource_role"
+URL_SERVICE = "api/v1/webpanel/service"
 
 
 
@@ -41,3 +40,12 @@ def get_ip_address(hostname):
         address = hostname
     return address
 
+
+
+def read_yaml_config(yaml_file):
+    with open(yaml_file, 'r') as stream:
+        try:
+            result = yaml.load(stream)
+            return result
+        except yaml.YAMLError as exc:
+            print(exc)

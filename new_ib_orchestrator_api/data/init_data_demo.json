@@ -1,0 +1,1290 @@
+{   
+    "domain":[
+        {"auth_method":["LocalAuth"], 
+            "domain":"getaway-app",
+            "domain_description":"Getaway application", 
+            "domain_type":"Application"},
+    
+        {"auth_method":["LocalAuth"], 
+            "domain":"log-management",
+            "domain_description":"Log management system", 
+            "domain_type":"Application"},
+        
+        {"auth_method":["LocalAuth"], 
+                "domain":"voting-app",
+                "domain_description":"Voting app", 
+                "domain_type":"Application"},
+            
+        {"auth_method":["LocalAuth"], 
+            "domain":"demo-net",
+            "domain_description":"Demo network", 
+            "domain_type":"Network"}
+    ],
+
+    "user":[
+            {
+                "first_name":"test_user",
+                "is_active": "True",
+                "password": "test_userpass",
+                "repeat_password":"test_userpass",
+                "roles": ["domainAdmin"],
+                "user_auth_method":	"LocalAuth",
+                "user_domain":"getaway-app",
+                "username":	"test_user"
+            }
+    ],
+
+    "resource_user":[
+        {
+            "is_active": true,
+            "password": "processor-awspass",
+            "role": "switchOwner",
+            "role_id":"switchOwner",
+            "user_domain":"demo-net",
+            "username":	"processor-aws"
+        },
+        {
+            "is_active": true,
+            "password": "processor-azpass",
+            "role": "switchOwner",
+            "role_id":"switchOwner",
+            "user_domain":"demo-net",
+            "username":	"processor-az"
+        },
+        {
+            "is_active": true,
+            "password": "processor-kvpass",
+            "role": "switchOwner",
+            "role_id":"switchOwner",
+            "user_domain":"demo-net",
+            "username":	"processor-kv"
+        },
+        {
+            "is_active": true,
+            "password": "processor-kv2pass",
+            "role": "switchOwner",
+            "role_id":"switchOwner",
+            "user_domain":"demo-net",
+            "username":	"processor-kv2"
+        },
+        {
+            "is_active": true,
+            "password": "processor-sfpass",
+            "role": "switchOwner",
+            "role_id":"switchOwner",
+            "user_domain":"demo-net",
+            "username":	"processor-sf"
+        },
+        {
+            "is_active": true,
+            "password": "processor-gcppass",
+            "role": "switchOwner",
+            "role_id":"switchOwner",
+            "user_domain":"demo-net",
+            "username":	"processor-gcp"
+        },
+        {
+            "is_active": true,
+            "password": "workerpass",
+            "role": "hostOwner",
+            "role_id":"hostOwner",
+            "user_domain":"log-management",
+            "username":	"worker"
+        },
+        {
+            "is_active": true,
+            "password": "workerpass",
+            "role": "hostOwner",
+            "role_id":"hostOwner",
+            "user_domain":"getaway-app",
+            "username":	"worker"
+        },
+        {
+            "is_active": true,
+            "password": "workerpass",
+            "role": "hostOwner",
+            "role_id":"hostOwner",
+            "user_domain":"voting-app",
+            "username":	"worker"
+        },
+        {
+            "is_active": true,
+            "password": "password12",
+            "role": "hostOwner",
+            "role_id":"hostOwner",
+            "user_domain":"getaway-app",
+            "username":	"news-gw"
+        },
+        {
+            "is_active": true,
+            "password": "password12",
+            "role": "hostOwner",
+            "role_id":"hostOwner",
+            "user_domain":"getaway-app",
+            "username":	"weather-gw"
+        },
+        {
+            "is_active": true,
+            "password": "password12",
+            "role": "hostOwner",
+            "role_id":"hostOwner",
+            "user_domain":"getaway-app",
+            "username":	"getaway-app"
+        },
+        {
+            "is_active": true,
+            "password": "password12",
+            "role": "hostOwner",
+            "role_id":"hostOwner",
+            "user_domain":"getaway-app",
+            "username":	"places-gw"
+        },
+        {
+            "is_active": true,
+            "password": "password12",
+            "role": "hostOwner",
+            "role_id":"hostOwner",
+            "user_domain":"getaway-app",
+            "username":	"http-proxy"
+        }
+        
+    ],
+
+    "controller":[
+        {
+            "descr":"Main controller",
+            "enable":true,
+            "name":"controller"
+        }
+    ],
+
+    "zone":[
+        {   
+            "ipsec_enable":	true,
+            "cga_prefix": "fd32:10d7:b78f:9fc6",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"aws-1",
+            "description":	"AWS Zone us-west-1",
+            "name":	"AWS Zone-1"
+        },
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "fd32:10d7:b78f:9fc6",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"aws-1",
+            "description":	"AWS Zone ca-central-1",
+            "name":	"AWS Zone-2"
+        },
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "fd32:10d7:b78f:9fc6",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"aws-1",
+            "description":	"AWS Zone us-east-2",
+            "name":	"AWS Zone-3"
+        },
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "fd32:10d7:b78f:9fc6",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"aws-1",
+            "description":	"AWS Zone us-east-1",
+            "name":	"AWS Zone-4"
+        },
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "00:00:00",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",            
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"aws-2",
+            "description":	"AWS Zone Brazil (ADSB-3)",
+            "name":"AWS Zone-5"
+        },
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "00:00:00",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"aws-3",
+            "description":	"AWS Zone UK (ADSU)",
+            "name":"AWS Zone-6"
+        },
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "fd32:10d7:b78f:9fc6",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"az-2",
+            "description":	"Azure Zone",
+            "name":	"AZR Zone"
+        },
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "fd32:10d7:b78f:9fc6",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"gcp-p1",
+            "description":	"Google Zone",
+            "name":	"GCP Zone"
+        },
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "00:00:00",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"bwsf-1",
+            "description":	"Private Customer - AT&T Internet Services",
+            "name":"Private Customer - AT&T Internet Services"
+        },
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "00:00:00",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"bwkv1",
+            "description":	"Kyiv Private Cloud-1",
+            "name":"Kyiv Private Cloud-1"
+        },
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "00:00:00",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"bwkv2",
+            "description":	"Kyiv Private Cloud-2",
+            "name":"Kyiv Private Cloud-2"
+        }
+        ,
+        {
+            "ipsec_enable":	true,
+            "cga_prefix": "00:00:00",
+            "controller_pri_id":"controller",
+            "controller_sec_id":"",
+            "tunnel_ip_type":	1,
+            "tunnel_switch_domain_id":	"demo-net",
+            "tunnel_switch_id":	null,
+            "tunnel_switch_iface":	null,
+            "tunnel_switch_name":"bwkv3",
+            "description":	"Kyiv Private Cloud-3",
+            "name":"Kyiv Private Cloud-3"
+        }
+    ],
+
+
+    "managed_network":[
+        {
+            "network_prefix":"1.2.2.3/21",
+            "subnet_id":	"AWS Zone-1",
+            "network_files": [
+              "zones/nets-aws-us-west-1.json"
+            ],
+            "networks":[]
+        },
+        {
+            "network_prefix":"1.2.2.3/21",
+            "subnet_id":	"AWS Zone-2",
+            "network_files": [
+              "zones/nets-aws-ca-central-1.json"
+            ],
+            "networks":[]
+        },
+        {
+            "network_prefix":"1.2.2.3/21",
+            "subnet_id":	"AWS Zone-3",
+            "network_files": [
+              "zones/nets-aws-us-east-2.json"
+            ],
+            "networks":[]
+        },
+        {
+            "network_prefix":"1.2.2.3/21",
+            "subnet_id":	"AWS Zone-4",
+            "network_files": [
+              "zones/nets-aws-us-east-1.json"
+            ],
+            "networks":[]
+        },
+        {
+            "network_prefix":"1.2.2.3/21",
+            "subnet_id":	"AZR Zone",
+            "network_files": [
+              "zones/nets-azure.json"
+            ],
+            "networks":[]
+        },
+        {
+            "network_prefix":"0.0.0.0/24",
+            "subnet_id":	"GCP Zone",
+            "network_files": [
+              "zones/nets-gcp.json"
+            ],
+            "networks":[]
+        },
+        {
+            "network_prefix":"0.0.0.0/24",
+            "subnet_id":	"AWS Zone-5",
+            "network_files": [
+              "zones/nets-adsb-3.json"
+            ],
+            "networks":[]
+        },
+        {
+            "network_prefix":"0.0.0.0/24",
+            "subnet_id":	"AWS Zone-6",
+            "network_files": [
+              "zones/nets-adsu.json"
+            ],
+            "networks":[]
+        },
+        {
+            "network_prefix":"0.0.0.0/24",
+            "subnet_id":	"Private Customer - AT&T Internet Services",
+            "networks":["104.7.15.90/32"]
+        },
+        {
+            "network_prefix":"0.0.0.0/24",
+            "subnet_id":	"Kyiv Private Cloud-1",
+            "networks":["213.156.74.84/32"]
+        },
+        {
+            "network_prefix":"0.0.0.0/24",
+            "subnet_id":	"Kyiv Private Cloud-2",
+            "networks":["213.156.74.85/32"]
+        },
+        {
+            "network_prefix":"0.0.0.0/24",
+            "subnet_id":	"Kyiv Private Cloud-3",
+            "networks":["213.156.74.86/32"]
+        }
+    ],
+
+
+    "service_template":[
+        {
+            "domains": [{"domain_name":	"getaway-app",
+                        "id":"1"}, 
+                        {"domain_name":	"log-management",
+                        "id":"1"}],
+            "enable": true,
+            "service_tepl_file":"templates/ClientServer.tmpl"
+        },
+        {
+            "domains": [{"domain_name":	"getaway-app",
+                        "id":"1"}, 
+                        {"domain_name":	"log-management",
+                        "id":"1"}],
+            "enable": true,
+            "service_tepl_file": "templates/ClientServerMultipoint.tmpl"
+        },
+        {
+            "domains": [{"domain_name":	"getaway-app",
+                        "id":"1"}, 
+                        {"domain_name":	"log-management",
+                        "id":"1"}],
+            "enable": true,
+            "service_tepl_file": "templates/ClientServerMultipointTag.tmpl"
+        }
+    ],
+
+
+    "contracts":[
+        {
+            "domain":"getaway-app",
+            "domain_id":	"0",
+            "description":	"Dispatch user getaway requests",
+            "enable":true,
+            "name":"frontend",
+            "serviceName":"client-server",
+            "service_id":	"0",
+            "contract_roles":[
+                {
+                    "acl_params":	null,
+                    "endpoint_rules": null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"server\",\"contract\":\"frontend\"}",
+                    "program_data_params":	null,
+                    "role_name": "client",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "frontend.getaway-app.ib.loc",
+                    "service_role_id": "",
+                    "service_role":"client",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                        "domain": { "domain_name": "name",
+                            "id": 0},
+                        "domain_id":	0,
+                        "id":	0,
+                        "user_name":"http-proxy"
+                        }
+                    ]
+                },
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"client\",\"contract\":\"frontend\"}",
+                    "program_data_params":	null,
+                    "role_name": "server",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "",
+                    "service_role_id": "",
+                    "service_role":"server",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": { "domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"getaway-app"
+                        }
+                    ]
+                }
+            ]
+            
+        },
+        {
+            "domain":"getaway-app",
+            "domain_id":	"0",
+            "description":	"Retrieve news data",
+            "enable":true,
+            "name":"news-api",
+            "serviceName":"client-server",
+            "service_id":	"0",
+            "contract_roles":[
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"server\",\"contract\":\"news-api\"}",
+                    "program_data_params":	null,
+                    "role_name": "client",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "news-api.getaway-app.ib.loc",
+                    "service_role_id": "",
+                    "service_role":"client",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                        "domain": { "domain_name": "name",
+                            "id": 0},
+                        "domain_id":	0,
+                        "id":	0,
+                        "user_name":"getaway-app"
+                        }
+                    ]
+                },
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"client\",\"contract\":\"news-api\"}",
+                    "program_data_params":	null,
+                    "role_name": "server",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "",
+                    "service_role_id": "",
+                    "service_role":"server",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": { "domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"news-gw"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain":"getaway-app",
+            "domain_id":	"0",
+            "description":	"Retrieve places data",
+            "enable":true,
+            "name":"places-api",
+            "serviceName":"client-server",
+            "service_id":	"0",
+            "contract_roles":[
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"server\",\"contract\":\"places-api\"}",
+                    "program_data_params":	null,
+                    "role_name": "client",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "places-api.getaway-app.ib.loc",
+                    "service_role_id": "",
+                    "service_role":"client",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                        "domain": { "domain_name": "name",
+                            "id": 0},
+                        "domain_id":	0,
+                        "id":	0,
+                        "user_name":"getaway-app"
+                        }
+                    ]
+                },
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"client\",\"contract\":\"places-api\"}",
+                    "program_data_params":	null,
+                    "role_name": "server",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "",
+                    "service_role_id": "",
+                    "service_role":"server",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": { "domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"places-gw"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain":"getaway-app",
+            "domain_id":	"0",
+            "description":	"Retrieve weather data",
+            "enable":true,
+            "name":"weather-api",
+            "serviceName":"client-server",
+            "service_id":	"0",
+            "contract_roles":[
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"server\",\"contract\":\"weather-api\"}",
+                    "program_data_params":	null,
+                    "role_name": "client",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_role_id": "",
+                    "service_resolve": "weather-api.getaway-app.ib.loc",
+                    "service_role":"client",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                        "domain": { "domain_name": "name",
+                            "id": 0},
+                        "domain_id":	0,
+                        "id":	0,
+                        "user_name":"getaway-app"
+                        }
+                    ]
+                },
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"client\",\"contract\":\"weather-api\"}",
+                    "program_data_params":	null,
+                    "role_name": "server",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_role_id": "",
+                    "service_resolve": "",
+                    "service_role":"server",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                        "domain": { "domain_name": "name",
+                            "id": 0},
+                        "domain_id":	0,
+                        "id":	0,
+                        "user_name":"weather-gw"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain":"getaway-app",
+            "domain_id":	"0",
+            "description":	"Dispatch user voting requests",
+            "enable": true,
+            "name": "voting-frontend",
+            "serviceName": "client-server",
+            "service_id":	"0",
+            "contract_roles":[
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"server\",\"contract\":\"voting-frontend\"}",
+                    "program_data_params":	null,
+                    "role_name": "client",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "voting-frontend.voting-app.ib.loc",
+                    "service_role_id": "",
+                    "service_role":"client",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                        "domain": {
+                                "domain_name": "name",
+                                "id": 0
+                                },
+                        "domain_id":	0,
+                        "id":	0,
+                        "user_name":"http-proxy"
+                        }
+                    ]
+                },
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"client\",\"contract\":\"voting-frontend\"}",
+                    "program_data_params":	null,
+                    "role_name": "server",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "",
+                    "service_role_id": "",
+                    "service_role":"server",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": { "domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"getaway-app"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain":"getaway-app",
+            "domain_id":	"0",
+            "description":	"Access voting store",
+            "enable":true,
+            "name":"voting-backend",
+            "serviceName":"client-server",
+            "service_id":	"0",
+            "contract_roles":[
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"server\",\"contract\":\"voting-backend\"}",
+                    "program_data_params":	null,
+                    "role_name": "client",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "voting-backend.voting-app.ib.loc",
+                    "service_role_id": "",
+                    "service_role":"client",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                        "domain": { "domain_name": "name",
+                            "id": 0},
+                        "domain_id":	0,
+                        "id":	0,
+                        "user_name":"getaway-app"
+                        }
+                    ]
+                },
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"client\",\"contract\":\"voting-backend\"}",
+                    "program_data_params":	null,
+                    "role_name": "server",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "",
+                    "service_role_id": "",
+                    "service_role":"server",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": { "domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"getaway-app"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain":"getaway-app",
+            "domain_id":	"0",
+            "description":	"Dispatch user result requests",
+            "enable":true,
+            "name":"result-frontend",
+            "serviceName":"client-server",
+            "service_id":	"0",
+            "contract_roles":[
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"server\",\"contract\":\"result-frontend\"}",
+                    "program_data_params":	null,
+                    "role_name": "client",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "result-frontend.voting-app.ib.loc",
+                    "service_role_id": "",
+                    "service_role":"client",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                        "domain": {"domain_name": "name",
+                            "id": 0},
+                        "domain_id":	0,
+                        "id":	0,
+                        "user_name":"http-proxy"
+                        }
+                    ]
+                },
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"client\",\"contract\":\"result-frontend\"}",
+                    "program_data_params":	null,
+                    "role_name": "server",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "",
+                    "service_role_id": "",
+                    "service_role":"server",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": {"domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"getaway-app"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain":"getaway-app",
+            "domain_id":	"0",
+            "description":	"Access result store",
+            "enable":true,
+            "name":"result-backend",
+            "serviceName":"client-server",
+            "service_id":	"0",
+            "contract_roles":[
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"server\",\"contract\":\"result-backend\"}",
+                    "program_data_params":	null,
+                    "role_name": "client",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "result-backend.voting-app.ib.loc",
+                    "service_role_id": "",
+                    "service_role":"client",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                        "domain": {"domain_name": "name",
+                            "id": 0},
+                        "domain_id":	0,
+                        "id":	0,
+                        "user_name":"getaway-app"
+                        }
+                    ]
+                },
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"client\",\"contract\":\"result-backend\"}",
+                    "program_data_params":	null,
+                    "role_name": "server",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "",
+                    "service_role_id": "",
+                    "service_role":"server",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": {"domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"getaway-app"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+
+            "domain":"getaway-app",
+            "domain_id":	"0",
+            "description":	"Process voting request",
+            "enable":true,
+            "name":"voting-worker",
+            "serviceName":"client-server",
+            "service_id":	"0",
+            "contract_roles":[
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"server\",\"contract\":\"voting-worker\"}",
+                    "program_data_params":	null,
+                    "role_name": "client",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "voting-worker.voting-app.ib.loc",
+                    "service_role_id": "",
+                    "service_role":"client",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": {"domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"getaway-app"
+                        }
+                    ]
+                },
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"client\",\"contract\":\"voting-worker\"}",
+                    "program_data_params":	null,
+                    "role_name": "server",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "",
+                    "service_role_id": "",
+                    "service_role":"server",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": {"domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"getaway-app"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain":"getaway-app",
+            "domain_id":	"0",
+            "description":	"Process voting result",
+            "enable":true,
+            "name":"result-worker",
+            "serviceName":"client-server",
+            "service_id":	"0",
+            "contract_roles":[
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"server\",\"contract\":\"result-worker\"}",
+                    "program_data_params":	null,
+                    "role_name": "client",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "result-worker.voting-app.ib.loc",
+                    "service_role_id": "",
+                    "service_role":"client",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": {"domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"getaway-app"
+                        }
+                    ]
+                },
+                {
+                    "acl_params":	null,
+                    "code_map":	null,
+                    "description":	"",
+                    "enable":	true,
+                    "path_params":	"{\"role\":\"client\",\"contract\":\"result-worker\"}",
+                    "program_data_params":	null,
+                    "role_name": "server",
+                    "send_pkt_interval":	5,
+                    "service_params": null,
+                    "service_resolve": "",
+                    "service_role_id": "",
+                    "service_role":"server",
+                    "token_params": null,
+                    "topic_id": 4,
+                    "users": [
+                        {
+                            "domain": {"domain_name": "name",
+                                "id": 0},
+                            "domain_id":	0,
+                            "id":	0,
+                            "user_name":"getaway-app"
+                        }
+                    ]
+                }
+            ]
+        }
+
+    ],
+    "services":[
+        {
+            "topic_roles":[
+                            {"topic_name":"frontend", "topic_role_name":"client"}
+                        ],
+            "description":"frontend-client",
+            "name" : "client",
+            "enable": true,
+            "domain_name": "getaway-app",
+            "domain_id": ""
+        },
+        {
+            "topic_roles":[
+                            {"topic_name":"frontend", "topic_role_name":"server"}
+                        ],
+            "description":"frontend-server",
+            "name" : "server",
+            "enable": true,
+            "domain_name": "getaway-app",
+            "domain_id": ""
+        }
+        
+    ],
+
+    "service_token":[
+        {   
+            "service_name":"server",
+            "service_id": "",
+            "domain_name": "getaway-app",
+            "token":	"5909b8b61fc911e9ab14d663bd873d93",
+            "expire_date":	"1580844154",
+            "token_ident":	"3d93"
+        },
+        {   
+            "service_name":"client",
+            "service_id": "",
+            "domain_name": "getaway-app",
+            "token":	"5909b60e1fc911e9ab14d663bd873d93",
+            "expire_date":	"1580844154",
+            "token_ident":	"3d93"
+        }
+
+    ],
+
+    "configure_links": [
+        {   
+            "node_a":	"aws2",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"aws1",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 2
+        },
+        {   
+            "node_a":	"aws1",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"aws3",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 0
+        },
+        {   
+            "node_a":	"aws1",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"bwkv1",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 2
+        },
+        {   
+            "node_a":	"bwsf1",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"aws1",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 2
+        },
+        {   
+            "node_a":	"az2",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"aws1",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 0
+        },
+        {   
+            "node_a":	"aws2",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"az2",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 2
+        },
+        {   
+            "node_a":	"aws3",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"aws2",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 2
+        },
+        {   
+            "node_a":	"bwkv3",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"aws3",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 2
+        },
+        {   
+            "node_a":	"bwsf1",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"az2",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 2
+        },
+        {   
+            "node_a":	"az2",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"gcp2",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 0
+        },
+        {   
+            "node_a":	"bwsf1",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"bwkv1",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 2
+        },
+        {   
+            "node_a":	"bwsf1",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"gcp2",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 2
+        },
+        {   
+            "node_a":	"gcp2",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"bwkv2",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 0
+        },
+        {   
+            "node_a":	"bwkv1",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"bwkv2",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 1
+        },
+        {   
+            "node_a":	"bwkv3",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"bwkv1",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 1
+        },
+        {   
+            "node_a":	"bwkv3",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"bwkv2",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 1
+        },
+        {   
+            "node_a":	"bwkv3",
+            "domain_id_a":	0,
+            "domain_a": {"id":	0, "domain_name": "demo-net"},
+            "node_z":	"aws3",
+            "domain_id_z":	0,
+            "domain_z": {"id":	0, "domain_name": "demo-net"},
+            "admin_status":	true,
+            "ipsec_enable": true,
+            "tunnel_ip_type": 2
+        }
+    ]
+
+}

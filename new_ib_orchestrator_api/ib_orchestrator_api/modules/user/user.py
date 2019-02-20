@@ -50,7 +50,7 @@ class User(Core):
 
     def _get_dict_user(self, username=None, domain=None):
         if not isinstance(domain, Domain):
-                domain = Domain(url=self.url, session=self.session).get_domain(domain)
+            domain = Domain(url=self.url, session=self.session).get_domain(domain)
         tmp_users = self.get_all_user()
         result_user = ''
         for user in tmp_users['result']:
@@ -135,7 +135,7 @@ class User(Core):
 
     def get_all_user_from_domain(self, domain_name):
         url = self._get_user_url()
-        payload = {'user_domain':domain_name}
+        payload = {'user_domain': domain_name}
         result = self.session.get(url, params=payload, verify=False)
         all_users = json.loads(result.text)
         print(all_users)
@@ -191,11 +191,11 @@ class User(Core):
             message = "User dont created"
             print(message)
         else:
-            user_json =  dict([(vkey, vdata) for vkey, vdata in self.to_dict().items() if vdata ])
-            #if self._check_user_role():
-                #user_json = self._make_json()
-            #else:
-                #print("wrong user error")
+            user_json = dict([(vkey, vdata) for vkey, vdata in self.to_dict().items() if vdata])
+            # if self._check_user_role():
+            # user_json = self._make_json()
+            # else:
+            # print("wrong user error")
 
         url = self._get_user_url() + "/" + str(self.id)
         response = self.session.patch(url, json=user_json, verify=False)

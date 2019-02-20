@@ -1,13 +1,14 @@
+import json
 from ib_orchestrator_api.core.core import Core
 from ib_orchestrator_api.core.errors import ControllerError
 from ib_orchestrator_api.core.utils import *
 
 
 class Controller(Core):
-    def __init__(self, url, session, id=None, name=None, description=None, enable=None, host_fqdn=None):
-        self._id = id
+    def __init__(self, url, session, id=None, name=None, descr=None, enable=None, host_fqdn=None):
+        self.id = id
         self.name = name
-        self.descr = description
+        self.descr = descr
         self.enable = enable
         self.url = url
         self.session = session
@@ -42,8 +43,8 @@ class Controller(Core):
         """
 
         data = self.to_dict()
-        if "_id" in data.keys():
-            del data['_id']
+        if "id" in data.keys():
+            del data['id']
         for key, value in data.items():
             if value is None or value == '':
                 message = "Field '%s' can't be None" % str(key)
@@ -71,7 +72,7 @@ class Controller(Core):
         if not result_controller:
             return False
         else:
-            self._id = result_controller.get('id')
+            self.id = result_controller.get('id')
             return True
 
     def get_all_controllers(self):
@@ -93,7 +94,7 @@ class Controller(Core):
         controller = Controller(url=self.url, session=self.session)
         for field in result_controller.keys():
             if field == 'id':
-                setattr(controller, '_id', result_controller[field])
+                setattr(controller, 'id', result_controller[field])
             if field in vars(controller).keys():
                 setattr(controller, field, result_controller[field])
         return controller
@@ -104,7 +105,7 @@ class Controller(Core):
             controller_json = self._make_json()
             response = self.session.put(url, json=controller_json, verify=False)
             if response.status_code == 200 or response.status_code == 201:
-                self._id = (json.loads(response.text)).get('id')
+                self.id = (json.loads(response.text)).get('id')
                 return True
             else:
                 message = "Error add controller '%s'" % controller_json['name']
@@ -119,7 +120,7 @@ class Controller(Core):
         result = self._get_dict_controller(name=name)
         controller_id = ''
         if not result:
-            print("netu usera")
+            print("net controllera")
         else:
             controller_id = result.get('id')
 

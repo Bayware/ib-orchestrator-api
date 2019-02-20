@@ -14,7 +14,7 @@ def domain(ctx):
 
 
 @click.command()
-@click.option('domain_name', '-d', required=True, help='enter domain name')
+@click.argument('domain_name')
 @click.pass_context
 def get(ctx, domain_name):
     """Method return domain by name, if domain exists"""
@@ -25,7 +25,7 @@ def get(ctx, domain_name):
 
 @click.command()
 @click.pass_context
-def get_all(ctx):
+def list(ctx):
     """Method retruns all domains that exist"""
     session = authorization(ctx.obj['url'])
     result = Domain(url=ctx.obj['url'], session=session).get_all_domains()
@@ -83,7 +83,7 @@ def delete(ctx, domain_name):
 
 
 domain.add_command(get)
-domain.add_command(get_all)
+domain.add_command(list)
 domain.add_command(create)
 domain.add_command(update)
 domain.add_command(delete)

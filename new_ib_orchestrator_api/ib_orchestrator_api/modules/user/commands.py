@@ -14,7 +14,7 @@ def user(ctx):
 
 
 @click.command()
-@click.option("--username", '-n', required=True, help='User name')
+@click.option("--username", '-u', required=True, help='User name')
 @click.option("--domain", '-d', required=True, help='Domain name')
 @click.pass_context
 def get(ctx, username, domain):
@@ -29,7 +29,7 @@ def get(ctx, username, domain):
 @click.command()
 @click.option('--domain', '-d', help='Domain name')
 @click.pass_context
-def get_all(ctx, domain):
+def list(ctx, domain):
     """
     Get all user, with flag -d --get all user from domain
     """
@@ -41,7 +41,6 @@ def get_all(ctx, domain):
         result = User(url=ctx.obj['url'], session=session).get_all_user()
         # print(result)
         click.echo(result)
-
 
 
 @click.command()
@@ -63,6 +62,7 @@ def create(ctx, file):
             result = user.create_user()
             click.echo(result)
 
+
 @click.command()
 @click.option('--first_name')
 @click.option('--is_active')
@@ -70,7 +70,7 @@ def create(ctx, file):
 @click.option('--roles')
 @click.option('--user_auth_method')
 @click.option('--user_domain', '-d', required=True)
-@click.option('--username', '-n', required=True)
+@click.option('--username', '-u', required=True)
 @click.pass_context
 def update(ctx, username, user_domain, **kwargs):
     session = authorization(ctx.obj['url'])
@@ -81,13 +81,14 @@ def update(ctx, username, user_domain, **kwargs):
         if field in vars(user).keys():
             setattr(user, field, kwargs[field])
 
-    #print("BEFORE UPDATE")
-    #print(user.to_dict())
+    # print("BEFORE UPDATE")
+    # print(user.to_dict())
     if user.update_user():
         click.echo("Update success")
 
+
 @click.command()
-@click.option("--username", '-n', required=True, help='enter user name')
+@click.option("--username", '-u', required=True, help='enter user name')
 @click.option("--domain", '-d', required=True, help='enter domain name')
 @click.pass_context
 def delete(ctx, username, domain):
@@ -98,7 +99,7 @@ def delete(ctx, username, domain):
 
 
 user.add_command(get)
-user.add_command(get_all)
+user.add_command(list)
 user.add_command(create)
 user.add_command(update)
 user.add_command(delete)

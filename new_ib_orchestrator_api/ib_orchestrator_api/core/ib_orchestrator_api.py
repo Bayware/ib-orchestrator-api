@@ -86,7 +86,6 @@ class IBOrchestratorAPI(Core):
         link = Link(url=self.base_url, session=self.session, **kwargs)
         return link
 
-
     @staticmethod
     def read_from_json(filename):
         with open(filename, 'r') as f:
@@ -309,23 +308,23 @@ class IBOrchestratorAPI(Core):
         managed_network.update({"subnet_id": int(zone_id)})
         result = self.session.get(url, verify=False)
         tmp_managed = json.loads(result.text)
-        #print(managed_network)
+        # print(managed_network)
         if 'network_files' in managed_network.keys():
             del managed_network['network_files']
-        #print(managed_network)
-        #response = self.session.put(url, json=managed_network, verify=False)
+        # print(managed_network)
+        # response = self.session.put(url, json=managed_network, verify=False)
         # print(managed_network)
 
-        #if response.status_code == 200 or response.status_code == 201:
-            #return True
-       # else:
-            #raise ManagedNetworkError()
+        # if response.status_code == 200 or response.status_code == 201:
+        # return True
+        # else:
+        # raise ManagedNetworkError()
 
         if not any(d["network_prefix"] == managed_network["network_prefix"] for d in tmp_managed['result']):
             response = self.session.put(url, json=managed_network, verify=False)
             # print(managed_network)
             # print(response)
-            #print(response.text)
+            # print(response.text)
             if response.status_code == 200 or response.status_code == 201:
 
                 return True
@@ -333,7 +332,6 @@ class IBOrchestratorAPI(Core):
                 raise ManagedNetworkError()
         else:
             return False
-
 
     def add_zone_managed_network(self, managed_network):
         url_subnet = self.base_url + URL_ZONE
@@ -727,7 +725,6 @@ class IBOrchestratorAPI(Core):
             print(response.text)
         else:
             print("service already create")
-
 
     def get_all_service_token(self, service_id=None):
         url = self.base_url + "api/v1/webpanel/service/" + str(service_id) + "/token"

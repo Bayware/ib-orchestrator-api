@@ -8,11 +8,11 @@ from ib_orchestrator_api.core.utils import *
 
 class ResourceUser(Core):
     def __init__(self, url, session, id=None, username=None, user_domain=None, role=None, role_id=None, password=None,
-                 is_active=False):
+                 is_active=None):
         self.id = id
         self.username = username
         self.password = password
-        self.is_active = False
+        self.is_active = is_active
         self.url = url
         self.session = session
         self.user_domain = self._get_user_domain(user_domain)
@@ -146,6 +146,24 @@ class ResourceUser(Core):
         resource_users = json.loads(result.text)
         return resource_users
 
+    def get_all_in_domain(self, domain_name):
+        url = self._get_resource_user_url()
+        payload = {'domain.domain_name': domain_name}
+        result = self.session.get(url, params=payload, verify=False)
+        response = json.loads(result.text)
+        return response
+
+    def get_resource_user_id(self, username, domain_name):
+        url = self._get_resource_user_url()
+        payload = {"username": username, 'domain.domain_name': domain_name}
+        result = self.session.get(url, params=payload, verify=False)
+        response = json.loads(result.text)
+        # print(response)
+        if response['count_all'] == 0:
+            raise UserError()
+        else:
+            return response['result'][0].get('id')
+
     def create_resource_user(self):
         """
         Example resource user jeson
@@ -164,13 +182,29 @@ class ResourceUser(Core):
             response = self.session.put(url, json=resource_user_json, verify=False)
             if response.status_code == 200 or response.status_code == 201:
                 self.id = (json.loads(response.text)).get('id')
-                return True
+                return response.text
             else:
                 message = "Error add  resource_user '%s' " % (resource_user_json['username'])
                 raise UserError(error_message=message)
 
     def update_resource_user(self):
-        pass
+        update_data=''
+        if update_data:
+            pass
+        # else:
+            user_json = dict([(vkey, vdata) for vkey, vdata in self.to_dict().items() if vdata])
+        #print(user_json)
+        # url = self._get_resource_user_url() + "/" + str(self.id)
+        # response = self.session.patch(url, json=user_json, verify=False)
+        # if response.status_code == 200 or response.status_code == 201:
+        # return True
+        # else:
+        # print(response.text)
 
-    def delet_resource_user(self):
-        pass
+    def delete_resource_user(self, username, domain_name):
+        resource_user_id = self.get_resource_user_id(username=username, domain_name=domain_name)
+        # print(resource_user_id)
+        url = self._get_resource_user_url() + "/" + str(resource_user_id)
+        # print(url)
+        response = self.session.delete(url, verify=False)
+        return response

@@ -27,6 +27,7 @@ URL_CONFIGURE_LINK = "api/v1/webpanel/configured_link"
 URL_RESOURCE_USER = "api/v1/webpanel/resource_user"
 URL_RESOURCE_ROLE = "api/v1/webpanel/resource_role"
 URL_SERVICE = "api/v1/webpanel/service"
+URL_RESOURCES = "api/v1/webpanel/node"
 
 
 

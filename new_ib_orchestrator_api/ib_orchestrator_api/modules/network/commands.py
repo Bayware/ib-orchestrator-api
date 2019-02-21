@@ -1,14 +1,14 @@
 import click
-from .zone import Zone
+from .network import Network
 from ib_orchestrator_api.core.utils import read_yaml_config
 from ib_orchestrator_api.core.auth import authorization
 
 
+
 @click.group()
-@click.option('--zone_name', '-z', help="zone name")
 @click.pass_context
-def zone(ctx, zone_name):
-    ctx.obj['zone_name'] = zone_name
+def subnet(ctx):
+    pass
 
 
 @click.command()
@@ -16,16 +16,12 @@ def zone(ctx, zone_name):
 def get(ctx):
     session = authorization(ctx)
 
-
 @click.command()
 @click.pass_context
 def list(ctx):
-    if ctx.obj['zone_name']:
-        print(ctx.obj['zone_name'])
     session = authorization(ctx)
-    result = Zone(url=ctx.obj['url'], session=session).get_all_zones()
+    result = Network(url=ctx.obj['url'], session=session).get_all_subnets()
     click.echo(result)
-
 
 @click.command()
 @click.option('--file', '-f', type=click.Path(exists=True))
@@ -37,12 +33,13 @@ def create(ctx, file):
     else:
         result = read_yaml_config(file)
         session = authorization(ctx)
-        with click.progressbar(result['zone'], label="Create Zone") as bar:
-            for zone in bar:
+
+        with click.progressbar(result['network'], label="add network") as bar:
+            for subnet in bar:
                 # print(type(domain))
                 # print(domain)
-                zone = Zone(url=ctx.obj['url'], session=session, **zone)
-                result = zone.create_zone()
+                subnet = Network(url=ctx.obj['url'], session=session, **subnet)
+                result = subnet.create_subnet()
                 # click.echo(result)
 
 
@@ -53,16 +50,15 @@ def update(ctx):
 
 
 @click.command()
-@click.argument('zone_name')
+@click.argument('network')
 @click.pass_context
 def delete(ctx, zone_name):
     session = authorization(ctx)
-    result = Zone(url=ctx.obj['url'], session=session).delete_zone(zone_name)
+    result = Network(url=ctx.obj['url'], session=session).delete_subnet()
     print(result)
 
-
-zone.add_command(get)
-zone.add_command(list)
-zone.add_command(create)
-# zone.add_command(update)
-zone.add_command(delete)
+subnet.add_command(get)
+subnet.add_command(list)
+subnet.add_command(create)
+#network.add_command(update)
+subnet.add_command(delete)

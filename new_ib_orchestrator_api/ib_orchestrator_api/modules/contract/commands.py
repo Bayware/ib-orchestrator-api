@@ -15,7 +15,7 @@ def contract(ctx):
 @click.option("--domain_name", '-d', help="domain name")
 @click.pass_context
 def get(ctx, contract_name, domain_name):
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     contract = Contract(url=ctx.obj['url'], session=session).get_contract(contract_name, domain_name)
     click.echo(contract.to_dict())
     print(contract.id)
@@ -39,7 +39,7 @@ def create(ctx, file):
         result = read_yaml_config(file)
         for resource_user in result['contracts']:
             # print(resource_user)
-            session = authorization(ctx.obj['url'])
+            session = authorization(ctx)
             contract = Contract(url=ctx.obj['url'], session=session, **resource_user)
             result = contract.create_contract()
             click.echo(result)
@@ -53,7 +53,7 @@ def update(ctx, username, domain_name, **kwargs):
 @click.command()
 @click.pass_context
 def delete(ctx, username, domain_name):
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
 
 
 contract.add_command(get)

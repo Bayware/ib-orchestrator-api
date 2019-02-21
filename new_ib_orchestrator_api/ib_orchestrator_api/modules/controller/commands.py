@@ -15,7 +15,7 @@ def controller(ctx):
 @click.option("--controller_name", '-n', required=True, help='Controller name')
 @click.pass_context
 def get(ctx, controller_name):
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     controller = Controller(url=ctx.obj['url'], session=session).get_contrroler(controller_name)
     click.echo(controller.to_dict())
 
@@ -23,7 +23,7 @@ def get(ctx, controller_name):
 @click.command()
 @click.pass_context
 def list(ctx):
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     result = Controller(url=ctx.obj['url'], session=session).get_all_controllers()
     click.echo(result)
 
@@ -37,7 +37,7 @@ def create(ctx, file):
     else:
         result = read_yaml_config(file)
         for controller in result['controller']:
-            session = authorization(ctx.obj['url'])
+            session = authorization(ctx)
             controller = Controller(url=ctx.obj['url'], session=session, **controller)
             result = controller.create_controller()
             click.echo(result)
@@ -54,7 +54,7 @@ def update(ctx, controller_name):
 @click.option("--controller_name", '-n', required=True, help='enter user name')
 @click.pass_context
 def delete(ctx,controller_name):
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     result = Controller(url=ctx.obj['url'], session=session).delete_controller(controller_name)
     click.echo(result)
 

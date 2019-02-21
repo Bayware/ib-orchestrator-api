@@ -63,7 +63,7 @@ class IBOrchestratorAPI(Core):
         return zone
 
     def subnet(self, **kwargs):
-        subnet = Subnet(url=self.base_url, session=self.session, **kwargs)
+        subnet = Network(url=self.base_url, session=self.session, **kwargs)
         return subnet
 
     def template(self, **kwargs):
@@ -277,7 +277,7 @@ class IBOrchestratorAPI(Core):
         zone_json.update({"controller_pri_id": controller_pri_id,
                           "controller_sec_id": controller_sec_id,
                           "tunnel_switch_domain_id": domain_id})
-        url_zone = self.base_url + "api/v1/webpanel/subnet"
+        url_zone = self.base_url + "api/v1/webpanel/network"
         result = self.session.get(url_zone, verify=False)
         tmp_zone = json.loads(result.text)
         if not any(d['name'] == zone_json['name'] for d in tmp_zone['result']):
@@ -304,7 +304,7 @@ class IBOrchestratorAPI(Core):
                     else:
                         return "you input invalid zone"
 
-        url = self.base_url + "api/v1/webpanel/subnet/" + zone_id + "/managed"
+        url = self.base_url + "api/v1/webpanel/network/" + zone_id + "/managed"
         managed_network.update({"subnet_id": int(zone_id)})
         result = self.session.get(url, verify=False)
         tmp_managed = json.loads(result.text)
@@ -842,7 +842,7 @@ class IBOrchestratorAPI(Core):
 
         for zone in tmp_zone['result']:
             zone_id = str(zone['id'])
-            url_managed_network = self.base_url + "api/v1/webpanel/subnet/" + zone_id + "/managed"
+            url_managed_network = self.base_url + "api/v1/webpanel/network/" + zone_id + "/managed"
             result = self.session.get(url_managed_network, verify=False)
             tmp_managed = json.loads(result.text)
             for subnet in tmp_managed['result']:
@@ -858,7 +858,7 @@ class IBOrchestratorAPI(Core):
 
     def add_missing_managed_network(self, zone_id, network):
         """ADD missing managed network into appropriate zone"""
-        zone_url = self.base_url + "api/v1/webpanel/subnet/%s/managed?limit=1&offset=0" % zone_id
+        zone_url = self.base_url + "api/v1/webpanel/network/%s/managed?limit=1&offset=0" % zone_id
         result = self.session.get(zone_url, verify=False)
         list_zone_settings = json.loads(result.text)
         list_zone_settings = list_zone_settings['result']
@@ -866,7 +866,7 @@ class IBOrchestratorAPI(Core):
         del list_zone_settings[0]['tunnel_switch_domain']
         list_zone_settings[0]['network_prefix'] = network
         managed_network_json = list_zone_settings[0]
-        add_managed_network_url = self.base_url + "api/v1/webpanel/subnet/%s/managed" % zone_id
+        add_managed_network_url = self.base_url + "api/v1/webpanel/network/%s/managed" % zone_id
         self.session.put(add_managed_network_url,
                          json=managed_network_json, verify=False)
         return True

@@ -15,7 +15,7 @@ def resources(ctx):
 @click.option("--domain", '-d', help="Domain name")
 @click.pass_context
 def get(ctx, name, domain):
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     result = Resources(url=ctx.obj['url'], session=session).get_rescources(name, domain)
     click.echo(result)
 
@@ -23,7 +23,7 @@ def get(ctx, name, domain):
 @click.command()
 @click.pass_context
 def list(ctx):
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     result = Resources(url=ctx.obj['url'], session=session).get_all_resources()
     click.echo(result)
 

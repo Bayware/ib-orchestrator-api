@@ -15,7 +15,7 @@ def resource_user(ctx):
 @click.option("--domain", '-d', required=True, help='enter domain name')
 @click.pass_context
 def get(ctx, username, domain):
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     r_user = ResourceUser(url=ctx.obj['url'], session=session).get_resource_user(username=username,
                                                                                  domain=domain)
     click.echo(r_user.to_dict())
@@ -26,11 +26,11 @@ def get(ctx, username, domain):
 @click.pass_context
 def list(ctx, domain_name):
     if domain_name:
-        session = authorization(ctx.obj['url'])
+        session = authorization(ctx)
         result = ResourceUser(url=ctx.obj['url'], session=session).get_all_in_domain(domain_name)
         click.echo(result)
     else:
-        session = authorization(ctx.obj['url'])
+        session = authorization(ctx)
         result = ResourceUser(url=ctx.obj['url'], session=session).get_all_resource_user()
         click.echo(result)
 
@@ -46,7 +46,7 @@ def create(ctx, file):
         result = read_yaml_config(file)
         for resource_user in result['resource_user']:
             # print(resource_user)
-            session = authorization(ctx.obj['url'])
+            session = authorization(ctx)
             resource_user = ResourceUser(url=ctx.obj['url'], session=session, **resource_user)
             result = resource_user.create_resource_user()
             click.echo(result)
@@ -61,7 +61,7 @@ def create(ctx, file):
 @click.pass_context
 def update(ctx, username, domain_name, **kwargs):
     #TODO
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     r_user = ResourceUser(url=ctx.obj['url'], session=session).get_resource_user(username, domain_name)
     print(r_user.to_dict())
     r_user.update_resource_user()
@@ -79,7 +79,7 @@ def update(ctx, username, domain_name, **kwargs):
 @click.option("--domain_name", '-d', required=True, help='enter domain name')
 @click.pass_context
 def delete(ctx, username, domain_name):
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     resource_user = ResourceUser(url=ctx.obj['url'], session=session).delete_resource_user(username=username,
                                                                                            domain_name=domain_name)
     click.echo(resource_user)

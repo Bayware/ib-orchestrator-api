@@ -1,14 +1,14 @@
-
 import requests
 import json
 from .errors import LoginError
 
 
-def authorization(base_url):
-    domain = 'default'
-    login = 'admin'
-    password = 'bayware1'
+def authorization(ctx):
+    domain = ctx.obj['domain']
+    login = ctx.obj['login']
+    password = ctx.obj['password']
     session = requests.session()
+    base_url = ctx.obj['url']
     token_url = base_url + "api/v1/webpanel/token"
     response = session.post(
         token_url,

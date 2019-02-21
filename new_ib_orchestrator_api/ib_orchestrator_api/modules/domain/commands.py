@@ -18,7 +18,7 @@ def domain(ctx):
 @click.pass_context
 def get(ctx, domain_name):
     """Method return domain by name, if domain exists"""
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     result = Domain(url=ctx.obj['url'], session=session).get_domain(domain_name)
     click.echo(result.to_dict())
 
@@ -27,7 +27,7 @@ def get(ctx, domain_name):
 @click.pass_context
 def list(ctx):
     """Method retruns all domains that exist"""
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     result = Domain(url=ctx.obj['url'], session=session).get_all_domains()
     click.echo(result)
 
@@ -44,7 +44,7 @@ def create(ctx, file):
         for domain in result['domain']:
             # print(type(domain))
             # print(domain)
-            session = authorization(ctx.obj['url'])
+            session = authorization(ctx)
             domain = Domain(url=ctx.obj['url'], session=session, **domain)
             result = domain.create_domain()
             click.echo(result)
@@ -58,7 +58,7 @@ def create(ctx, file):
 @click.pass_context
 def update(ctx, domain_name, *args, **kwargs):
     """Update domain on server"""
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     domain = Domain(url=ctx.obj['url'], session=session).get_domain(domain_name)
     # print(domain.to_dict())
     for field in kwargs:
@@ -77,7 +77,7 @@ def update(ctx, domain_name, *args, **kwargs):
 @click.pass_context
 def delete(ctx, domain_name):
     """Delete domain from server"""
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     result = Domain(url=ctx.obj['url'], session=session).delete_domain(domain_name=domain_name)
     click.echo(result)
 

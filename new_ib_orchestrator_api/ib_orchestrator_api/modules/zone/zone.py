@@ -73,7 +73,7 @@ class Zone(Core):
             if not self.tunnel_switch_domain:
                 return None
             else:
-                #print(self.tunnel_switch_domain)
+                # print(self.tunnel_switch_domain)
                 return self.tunnel_switch_domain.id
         else:
             if isinstance(tunnel_switch_domain_id, int):
@@ -110,11 +110,11 @@ class Zone(Core):
         if "id" in data.keys():
             del data['id']
         # for key, value in data.items():
-            # if key == 'controller_sec_id' or key == 'controller_sec':
-                # continue
-            # if value is None or value == '':
-                # message = "Field '%s' can't be None" % str(key)
-                # raise ZoneError(error_message=message)
+        # if key == 'controller_sec_id' or key == 'controller_sec':
+        # continue
+        # if value is None or value == '':
+        # message = "Field '%s' can't be None" % str(key)
+        # raise ZoneError(error_message=message)
         del data['controller_pri']
         del data['controller_sec']
         return data
@@ -150,7 +150,9 @@ class Zone(Core):
 
     def get_all_zones(self):
         url = self._get_zone_url()
+        print(url)
         result = self.session.get(url, verify=False)
+        print(result)
         all_zone = json.loads(result.text)
         return all_zone
 

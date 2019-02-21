@@ -7,7 +7,7 @@ from .resource_user_role import ResourceRole
 from .service import Service
 from .service_token import ServiceToken
 from .zone import Zone
-from .subnet import Subnet
+from .network import Network
 from .contract import Contract
 from .contract_role import ContractRole
 from .template import Template

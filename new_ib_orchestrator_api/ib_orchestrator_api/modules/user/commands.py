@@ -21,7 +21,7 @@ def get(ctx, username, domain):
     """
     Get user from domain. Enter username and domain, User name must be unique only within a domain
     """
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     user = User(url=ctx.obj['url'], session=session).get_user(username=username, domain=domain)
     click.echo(user.to_dict())
 
@@ -33,7 +33,7 @@ def list(ctx, domain):
     """
     Get all user, with flag -d --get all user from domain
     """
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     if domain:
         result = User(url=ctx.obj['url'], session=session).get_all_user_from_domain(domain_name=domain)
         click.echo(result)
@@ -57,7 +57,7 @@ def create(ctx, file):
         result = read_yaml_config(file)
         print(result)
         for user in result['user']:
-            session = authorization(ctx.obj['url'])
+            session = authorization(ctx)
             user = User(url=ctx.obj['url'], session=session, **user)
             result = user.create_user()
             click.echo(result)
@@ -73,7 +73,7 @@ def create(ctx, file):
 @click.option('--username', '-u', required=True)
 @click.pass_context
 def update(ctx, username, user_domain, **kwargs):
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     user = User(url=ctx.obj['url'], session=session).get_user(username=username, domain=user_domain)
     for field in kwargs:
         if not kwargs[field]:
@@ -93,7 +93,7 @@ def update(ctx, username, user_domain, **kwargs):
 @click.pass_context
 def delete(ctx, username, domain):
     """Delete user, input user name and domain name"""
-    session = authorization(ctx.obj['url'])
+    session = authorization(ctx)
     result = User(url=ctx.obj['url'], session=session).delete_user(username=username, domain_name=domain)
     click.echo(result)
 
